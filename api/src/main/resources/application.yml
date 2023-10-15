@@ -25,7 +25,7 @@ spring:
     show-sql: true
     generate-ddl: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.MySQLDialect
   logging:
