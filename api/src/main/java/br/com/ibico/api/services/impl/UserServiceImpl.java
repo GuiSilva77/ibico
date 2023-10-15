@@ -1,28 +1,31 @@
 package br.com.ibico.api.services.impl;
 
-import br.com.ibico.api.entities.Skill;
+import br.com.ibico.api.entities.Role;
 import br.com.ibico.api.entities.User;
-import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
+import br.com.ibico.api.repositories.RolesRepsitory;
 import br.com.ibico.api.repositories.SkillRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
-                           SkillRepository skillRepository) {
+                           SkillRepository skillRepository, RolesRepsitory rolesRepsitory, SkillRepository skillRepository1, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.skillRepository = skillRepository;
+        this.skillRepository = skillRepository1;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -37,6 +40,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto saveUser(UserPayload payload) {
         User user = payload.toUser();
+
+        user.setPasswd(passwordEncoder.encode(user.getPasswd()));
+        user.setRoles(Set.of(new Role(2L, "ROLE_USER")));
+
+        user.getSkills().forEach(skill -> {
+            if (!skillRepository.existsByName(skill.getName()))
+                skillRepository.save(skill);
+        });
 
         User savedUser = userRepository.save(user);
 

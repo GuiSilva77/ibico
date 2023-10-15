@@ -58,14 +58,21 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_skills",
-            joinColumns = @JoinColumn(name = "id_user"),
-            inverseJoinColumns = @JoinColumn(name = "id_skills"))
+            joinColumns = @JoinColumn(name = "id_user" , foreignKey = @ForeignKey(name = "FK_USER_SKILLS_USERS")),
+            inverseJoinColumns = @JoinColumn(name = "id_skills" , foreignKey = @ForeignKey(name = "FK_USER_SKILLS_SKILLS")))
     private Set<Skill> skills = new LinkedHashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "tb_user_role",
+            joinColumns = @JoinColumn(name = "id_user", foreignKey = @ForeignKey(name = "FK_USER_ROLES_USERS")),
+            inverseJoinColumns = @JoinColumn(name = "id_role", foreignKey = @ForeignKey(name = "FK_USER_ROLES_ROLES")))
+    private Set<Role> roles = new LinkedHashSet<>();
+
 
     public User() {
     }
 
-    public User(String cpf, String name, String passwd, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills) {
+    public User(String cpf, String name, String passwd, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills, Set<Role> roles) {
         this.cpf = cpf;
         this.name = name;
         this.passwd = passwd;
@@ -74,6 +81,7 @@ public class User {
         this.active = active;
         this.telephone = telephone;
         this.skills = skills;
+        this.roles = roles;
     }
 
     public User(String cpf, String name, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills) {
@@ -228,16 +236,11 @@ public class User {
         return new UserDto(this.cpf, this.name, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return active == user.active && Objects.equals(id, user.id) && Objects.equals(cpf, user.cpf) && Objects.equals(name, user.name) && Objects.equals(passwd, user.passwd) && Objects.equals(dateOfCreation, user.dateOfCreation) && Objects.equals(imgURL, user.imgURL) && Objects.equals(telephone, user.telephone) && Objects.equals(skills, user.skills);
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, cpf, name, passwd, dateOfCreation, imgURL, active, telephone, skills);
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }
