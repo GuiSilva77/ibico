@@ -1,0 +1,59 @@
+GET localhost:8080/v1/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "cpf": "40015681874"
+}
+
+###
+
+POST localhost:8080/v1/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "cpf": "40015681874",
+  "name": "John Doe",
+  "passwd": "123456789",
+  "imgURL": "https://www.google.com.br/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+  "telephone": "12345678901",
+  "skills": [
+    {
+      "name": "Cozinhar",
+      "description": "Cozinhar"
+    }
+  ]
+
+}
+
+###
+
+POST localhost:8080/v1/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "cpf": "40015681874",
+  "name": "John Doe",
+  "passwd": "123456789",
+  "imgURL": "https://www.google.com.br/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+  "telephone": "12345678901",
+  "skills": [
+    {
+      "name": "Cozinhar",
+      "description": "Cozinhar"
+    },
+    {
+      "name": "Servir",
+      "description": "Servir"
+    }
+  ]
+
+}
+
+###
+
+DELETE localhost:8080/v1/users HTTP/1.1
+Content-Type: application/json
+
+{
+  "cpf": "40015681874"
+}

@@ -1,26 +1,34 @@
 package br.com.ibico.api.services.impl;
 
+import br.com.ibico.api.entities.Skill;
 import br.com.ibico.api.entities.User;
+import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
+import br.com.ibico.api.repositories.SkillRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.UserService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final SkillRepository skillRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           SkillRepository skillRepository) {
         this.userRepository = userRepository;
+        this.skillRepository = skillRepository;
     }
 
     @Override
     public UserDto findUserByCpf(String cpf) {
         User user = userRepository.findByCpf(cpf).orElseThrow(() ->
-                new ResourceNotFoundException("User", "CPF", "")
+                new ResourceNotFoundException("User", "CPF", cpf)
         );
 
         return user.toUserDto();
@@ -36,9 +44,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(String cpf, UserPayload userDto) {
-        User user = userRepository.findByCpf(cpf).orElseThrow(() ->
-                new ResourceNotFoundException("User", "CPF", "")
+    public UserDto updateUser(UserPayload userDto) {
+        User user = userRepository.findByCpf(userDto.cpf()).orElseThrow(() ->
+                new ResourceNotFoundException("User", "CPF", userDto.cpf())
         );
 
         user.setName(userDto.name());
@@ -55,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deactivateUser(String cpf) {
         User user = userRepository.findByCpf(cpf).orElseThrow(() ->
-                new ResourceNotFoundException("User", "CPF", "")
+                new ResourceNotFoundException("User", "CPF", cpf)
         );
 
         user.setActive(false);
