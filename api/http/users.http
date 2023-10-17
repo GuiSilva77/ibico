@@ -13,6 +13,7 @@ Content-Type: application/json
 {
   "cpf": "40015681874",
   "name": "John Doe",
+  "username": "John_Doe",
   "passwd": "123456789",
   "imgURL": "https://www.google.com.br/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
   "telephone": "12345678901",

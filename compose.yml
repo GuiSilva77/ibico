@@ -8,7 +8,8 @@ services:
       MYSQL_DATABASE: ibico
       MYSQL_USER: anakin
       MYSQL_PASSWORD: kenobi
-    #add
+    volumes:
+      - ./scripts/script.sql:/docker-entrypoint-initdb.d/scripts.sql
   redis:
     image: redis:latest
     ports:
