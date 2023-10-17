@@ -36,6 +36,10 @@ public class User {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @NotNull
+    @Column(name = "username", nullable = false)
+    private String username;
+
     @Size(min = 8)
     @Column(name = "passwd", nullable = false)
     private String passwd;
@@ -68,6 +72,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "id_role", foreignKey = @ForeignKey(name = "FK_USER_ROLES_ROLES")))
     private Set<Role> roles = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "postedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Oportunity> oportunitiesPosted = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Review> reviews = new LinkedHashSet<>();
+
 
     public User() {
     }
@@ -84,9 +94,10 @@ public class User {
         this.roles = roles;
     }
 
-    public User(String cpf, String name, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills) {
+    public User(String cpf, String name, String username, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills) {
         this.cpf = cpf;
         this.name = name;
+        this.username = username;
         this.dateOfCreation = dateOfCreation;
         this.imgURL = imgURL;
         this.active = active;
@@ -94,9 +105,10 @@ public class User {
         this.skills = skills;
     }
 
-    public User(String cpf, String name, String passwd, String imgURL, boolean active, String telephone, Set<Skill> collect) {
+    public User(String cpf, String name, String username, String passwd, String imgURL, boolean active, String telephone, Set<Skill> collect) {
         this.cpf = cpf;
         this.name = name;
+        this.username = username;
         this.passwd = passwd;
         this.imgURL = imgURL;
         this.active = active;
@@ -184,6 +196,14 @@ public class User {
         this.name = name;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPasswd() {
         return passwd;
     }
@@ -233,7 +253,7 @@ public class User {
     }
 
     public UserDto toUserDto() {
-        return new UserDto(this.cpf, this.name, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
+        return new UserDto(this.cpf, this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
     }
 
     public Set<Role> getRoles() {
