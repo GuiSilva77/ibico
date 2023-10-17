@@ -1,7 +1,10 @@
 package br.com.ibico.api.services.impl;
 
+import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Role;
+import br.com.ibico.api.entities.Skill;
 import br.com.ibico.api.entities.User;
+import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
@@ -9,6 +12,9 @@ import br.com.ibico.api.repositories.RolesRepsitory;
 import br.com.ibico.api.repositories.SkillRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +32,35 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.skillRepository = skillRepository1;
         this.passwordEncoder = passwordEncoder;
+    }
+
+
+    //TODO: Implement Natural Language Search
+    @Override
+    public Response<UserDto> findUsers(String query, int pageNo, int pageSize, String sortBy, String sortDir) {
+        Page<User> page = userRepository.findByName(query, PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDir), sortBy)));
+
+        if (page.isEmpty()) {
+            return new Response<UserDto>(
+                    null,
+                    page.getNumber(),
+                    page.getSize(),
+                    page.getNumberOfElements(),
+                    page.getTotalPages(),
+                    page.isLast()
+            );
+        }
+
+        return new Response<UserDto>(
+                page.getContent().stream()
+                        .map(User::toUserDto)
+                        .toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getNumberOfElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
     }
 
     @Override

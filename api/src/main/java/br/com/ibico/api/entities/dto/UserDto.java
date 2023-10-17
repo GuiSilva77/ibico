@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 /**
  * DTO for {@link br.com.ibico.api.entities.User}
  */
-public record UserDto(@NotNull @Size(max = 11) String cpf, @NotNull String name, @NotNull LocalDateTime dateOfCreation,
+public record UserDto(@NotNull @Size(max = 11) String cpf, @NotNull String name, @NotNull String username,@NotNull LocalDateTime dateOfCreation,
                       @NotNull String imgURL, boolean active, @NotNull String telephone,
                       Set<SkillDto> skills) implements Serializable {
     public User toUser() {
-        return new User(this.cpf, this.name, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(SkillDto::toSkill).collect(Collectors.toSet()));
+        return new User(this.cpf, this.name, this.username,this.dateOfCreation, this.imgURL, this.active, this.telephone,this.skills.stream().map(SkillDto::toSkill).collect(Collectors.toSet()));
     }
 }
