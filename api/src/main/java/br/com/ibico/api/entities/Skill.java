@@ -4,10 +4,14 @@ import br.com.ibico.api.entities.dto.SkillDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import java.util.UUID;
 
 @Entity
+@Indexed
 @Table(
         name = "skills",
         uniqueConstraints = @UniqueConstraint(
@@ -21,6 +25,7 @@ public class Skill {
     private UUID id;
 
     @NotNull
+    @FullTextField
     @Size(min = 3, max = 50)
     @Column(name = "name", length = 50, nullable = false)
     private String name;

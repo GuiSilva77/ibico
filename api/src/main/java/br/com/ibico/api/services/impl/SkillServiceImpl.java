@@ -2,50 +2,54 @@ package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Skill;
+import br.com.ibico.api.entities.Skill;
+import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.SkillRepository;
 import br.com.ibico.api.services.SkillService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SkillServiceImpl implements SkillService {
 
     private final SkillRepository skillRepository;
 
-    public SkillServiceImpl(SkillRepository skillRepository) {
+    private final EntityManager entityManager;
+
+    public SkillServiceImpl(SkillRepository skillRepository, EntityManager entityManager) {
         this.skillRepository = skillRepository;
+        this.entityManager = entityManager;
     }
 
 
     @Override
+    @Transactional
     public Response<SkillDto> findSkills(String query, int pageNo, int pageSize, String sortBy, String sortDir) {
-        Page<Skill> page = skillRepository.findByName(query, PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDir), sortBy)));
+        SearchSession searchSession = Search.session(entityManager);
 
-        if (page.isEmpty()) {
-            return new Response<SkillDto>(
-                    null,
-                    page.getNumber(),
-                    page.getSize(),
-                    page.getNumberOfElements(),
-                    page.getTotalPages(),
-                    page.isLast()
-            );
-        }
+        SearchResult<Skill> result = searchSession.search(Skill.class)
+                .where(f -> f.wildcard().fields("name", "skillname").matching(query + "*"))
+                .fetch(pageNo * pageSize, pageSize);
 
-        return new Response<SkillDto>(
-                page.getContent().stream()
-                        .map(Skill::toSkillDto)
-                        .toList(),
-                page.getNumber(),
-                page.getSize(),
-                page.getNumberOfElements(),
-                page.getTotalPages(),
-                page.isLast()
-        );
+        List<SkillDto> skills = result.hits().stream()
+                .map(Skill::toSkillDto)
+                .toList();
+
+        long totalElements = result.total().hitCount();
+
+        int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+
+        boolean last = (pageNo + 1) >= totalPages;
+
+        return new Response<>(skills, pageNo, pageSize, (int) totalElements, totalPages, last, false);
     }
 
     @Override
