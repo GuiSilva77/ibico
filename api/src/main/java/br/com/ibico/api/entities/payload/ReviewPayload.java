@@ -12,8 +12,8 @@ import java.util.UUID;
  * DTO for {@link br.com.ibico.api.entities.Review}
  */
 public record ReviewPayload(@NotNull String review, int rating,
-                            UUID oportunityId) implements Serializable {
+                            String oportunityId) implements Serializable {
     public Review toReview() {
-        return new Review(review, rating, new Oportunity(oportunityId));
+        return new Review(review, rating, new Oportunity(UUID.fromString(oportunityId)));
     }
 }

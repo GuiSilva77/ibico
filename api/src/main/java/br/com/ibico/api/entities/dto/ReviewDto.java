@@ -9,6 +9,6 @@ import java.util.UUID;
 /**
  * DTO for {@link br.com.ibico.api.entities.Review}
  */
-public record ReviewDto(@NotNull String review, int rating, @NotNull LocalDateTime createdAt, UUID reviewerId,
+public record ReviewDto(UUID id, @NotNull String review, int rating, @NotNull LocalDateTime createdAt, UUID reviewerId,
                         UUID oportunityId) implements Serializable {
 }

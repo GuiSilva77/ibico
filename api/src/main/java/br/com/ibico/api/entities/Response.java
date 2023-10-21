@@ -7,5 +7,6 @@ public record Response<T>(List<T> items,
                           int pageSize,
                           int totalElements,
                           int totalPages,
-                          boolean last) {
+                          boolean last,
+                          boolean self) {
 }

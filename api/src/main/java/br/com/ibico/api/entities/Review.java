@@ -1,5 +1,6 @@
 package br.com.ibico.api.entities;
 
+import br.com.ibico.api.entities.dto.ReviewDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -112,5 +113,16 @@ public class Review {
     @Override
     public int hashCode() {
         return Objects.hash(id, review, rating, createdAt, reviewer, oportunity);
+    }
+
+    public ReviewDto toReviewDto() {
+        return new ReviewDto(
+                this.id,
+                this.review,
+                this.rating,
+                this.createdAt,
+                this.reviewer.getId(),
+                this.oportunity.getId()
+        );
     }
 }
