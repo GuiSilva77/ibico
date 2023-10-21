@@ -1,26 +1,26 @@
 package br.com.ibico.api.entities;
 
 import br.com.ibico.api.entities.dto.UserDto;
+import br.com.ibico.api.entities.dto.UserGetDto;
+import br.com.ibico.api.entities.dto.UserPutDto;
 import br.com.ibico.api.exceptions.ResourceNotValidException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(
-        name = "users",
-        uniqueConstraints = @UniqueConstraint(
-                name = "user_uq_cpf",
-                columnNames = "cpf"
-        )
-)
+@Indexed
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "user_uq_cpf", columnNames = "cpf"))
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,14 +29,17 @@ public class User {
 
     @Size(max = 11)
     @NotNull
+    @KeywordField
     @Column(name = "cpf", nullable = false, length = 11)
     private String cpf;
 
     @NotNull
+    @FullTextField
     @Column(name = "name", nullable = false)
     private String name;
 
     @NotNull
+    @FullTextField
     @Column(name = "username", nullable = false)
     private String username;
 
@@ -61,20 +64,18 @@ public class User {
     private String telephone;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_skills",
-            joinColumns = @JoinColumn(name = "id_user" , foreignKey = @ForeignKey(name = "FK_USER_SKILLS_USERS")),
-            inverseJoinColumns = @JoinColumn(name = "id_skills" , foreignKey = @ForeignKey(name = "FK_USER_SKILLS_SKILLS")))
+    @JoinTable(name = "user_skills", joinColumns = @JoinColumn(name = "id_user", foreignKey = @ForeignKey(name = "FK_USER_SKILLS_USERS")), inverseJoinColumns = @JoinColumn(name = "id_skills", foreignKey = @ForeignKey(name = "FK_USER_SKILLS_SKILLS")))
     private Set<Skill> skills = new LinkedHashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "tb_user_role",
-            joinColumns = @JoinColumn(name = "id_user", foreignKey = @ForeignKey(name = "FK_USER_ROLES_USERS")),
-            inverseJoinColumns = @JoinColumn(name = "id_role", foreignKey = @ForeignKey(name = "FK_USER_ROLES_ROLES")))
+    @JoinTable(name = "tb_user_role", joinColumns = @JoinColumn(name = "id_user", foreignKey = @ForeignKey(name = "FK_USER_ROLES_USERS")), inverseJoinColumns = @JoinColumn(name = "id_role", foreignKey = @ForeignKey(name = "FK_USER_ROLES_ROLES")))
     private Set<Role> roles = new LinkedHashSet<>();
 
+    @IndexedEmbedded
     @OneToMany(mappedBy = "postedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Oportunity> oportunitiesPosted = new LinkedHashSet<>();
 
+    @IndexedEmbedded
     @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Review> reviews = new LinkedHashSet<>();
 
@@ -105,6 +106,16 @@ public class User {
         this.skills = skills;
     }
 
+    public User(String name, String username, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills) {
+        this.name = name;
+        this.username = username;
+        this.dateOfCreation = dateOfCreation;
+        this.imgURL = imgURL;
+        this.active = active;
+        this.telephone = telephone;
+        this.skills = skills;
+    }
+
     public User(String cpf, String name, String username, String passwd, String imgURL, boolean active, String telephone, Set<Skill> collect) {
         this.cpf = cpf;
         this.name = name;
@@ -114,19 +125,6 @@ public class User {
         this.active = active;
         this.telephone = telephone;
         this.skills = collect;
-    }
-
-
-    @PrePersist
-    public void prePersist() {
-        if (!validateCpf(this.cpf))
-            throw new ResourceNotValidException("CPF is not valid");
-
-        if (!this.active && dateOfCreation == null)
-            this.active = true;
-
-        if (this.dateOfCreation == null)
-            this.dateOfCreation = LocalDateTime.now();
     }
 
     public static boolean validateCpf(String cpf) {
@@ -170,6 +168,15 @@ public class User {
 
         // Verify the second verification digit
         return Character.getNumericValue(cpf.charAt(10)) == segundoDigito;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (!validateCpf(this.cpf)) throw new ResourceNotValidException("CPF is not valid");
+
+        if (!this.active && dateOfCreation == null) this.active = true;
+
+        if (this.dateOfCreation == null) this.dateOfCreation = LocalDateTime.now();
     }
 
     public UUID getId() {
@@ -256,11 +263,34 @@ public class User {
         return new UserDto(this.cpf, this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
     }
 
+    public UserPutDto toUserPutDto() {
+        return new UserPutDto(this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
+    }
+
+    public UserDto toUserDtoMinusCPF() {
+        return new UserDto("", this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public UserGetDto toUserGetDto() {
+        return new UserGetDto(
+                name, username, dateOfCreation,
+                imgURL, active, telephone,
+                skills.stream()
+                        .map(Skill::toSkillDto)
+                        .collect(Collectors.toSet()),
+                oportunitiesPosted.stream()
+                        .map(Oportunity::toOportunityDto)
+                        .collect(Collectors.toSet()),
+                reviews.stream()
+                        .map(Review::toReviewDto)
+                        .collect(Collectors.toSet()));
     }
 }

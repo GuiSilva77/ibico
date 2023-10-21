@@ -2,22 +2,25 @@ package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Role;
-import br.com.ibico.api.entities.Skill;
 import br.com.ibico.api.entities.User;
-import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.UserDto;
+import br.com.ibico.api.entities.dto.UserGetDto;
+import br.com.ibico.api.entities.dto.UserPutDto;
 import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.RolesRepsitory;
 import br.com.ibico.api.repositories.SkillRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.UserService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -26,42 +29,41 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EntityManager entityManager;
 
     public UserServiceImpl(UserRepository userRepository,
-                           SkillRepository skillRepository, RolesRepsitory rolesRepsitory, SkillRepository skillRepository1, PasswordEncoder passwordEncoder) {
+                           SkillRepository skillRepository, RolesRepsitory rolesRepsitory, SkillRepository skillRepository1, PasswordEncoder passwordEncoder, EntityManager entityManager) {
         this.userRepository = userRepository;
         this.skillRepository = skillRepository1;
         this.passwordEncoder = passwordEncoder;
+        this.entityManager = entityManager;
     }
 
-
-    //TODO: Implement Natural Language Search
     @Override
+    @Transactional
     public Response<UserDto> findUsers(String query, int pageNo, int pageSize, String sortBy, String sortDir) {
-        Page<User> page = userRepository.findByName(query, PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDir), sortBy)));
+        SearchSession searchSession = Search.session(entityManager);
 
-        if (page.isEmpty()) {
-            return new Response<UserDto>(
-                    null,
-                    page.getNumber(),
-                    page.getSize(),
-                    page.getNumberOfElements(),
-                    page.getTotalPages(),
-                    page.isLast()
-            );
-        }
+        SearchResult<User> result = searchSession.search(User.class)
+                .where(f -> f.wildcard().fields("name", "username").matching(query + "*"))
+                .fetch(pageNo * pageSize, pageSize);
 
-        return new Response<UserDto>(
-                page.getContent().stream()
-                        .map(User::toUserDto)
-                        .toList(),
-                page.getNumber(),
-                page.getSize(),
-                page.getNumberOfElements(),
-                page.getTotalPages(),
-                page.isLast()
-        );
+        List<UserDto> users = result.hits().stream()
+                .map(user -> {
+                    if (user.isActive()) return null;
+                    return user.toUserDtoMinusCPF();
+                })
+                .toList();
+
+        long totalElements = result.total().hitCount();
+
+        int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+
+        boolean last = (pageNo + 1) >= totalPages;
+
+        return new Response<>(users, pageNo, pageSize, (int) totalElements, totalPages, last, false);
     }
+
 
     @Override
     public UserDto findUserByCpf(String cpf) {
@@ -90,7 +92,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserPayload userDto) {
+    public UserPutDto updateUser(UserPayload userDto) {
         User user = userRepository.findByCpf(userDto.cpf()).orElseThrow(() ->
                 new ResourceNotFoundException("User", "CPF", userDto.cpf())
         );
@@ -103,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
 
-        return savedUser.toUserDto();
+        return savedUser.toUserPutDto();
     }
 
     @Override
@@ -115,5 +117,14 @@ public class UserServiceImpl implements UserService {
         user.setActive(false);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public UserGetDto findUserByUsername(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new ResourceNotFoundException("User", "Username", username)
+        );
+
+        return user.toUserGetDto();
     }
 }

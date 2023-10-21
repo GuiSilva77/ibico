@@ -28,6 +28,12 @@ spring:
       ddl-auto: validate
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        search:
+          backend:
+            directory:
+              root: /Users/Guilh/.ibico/indexes
   logging:
     level:
       org.hibernate.SQL: debug
