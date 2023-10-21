@@ -4,6 +4,8 @@ import br.com.ibico.api.entities.dto.OportunityDto;
 import br.com.ibico.api.entities.enums.OportunityStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +13,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
+@Indexed
 @Table(
         name= "oportunities"
 )
@@ -21,10 +24,12 @@ public class Oportunity {
     private UUID id;
 
     @NotNull
+    @FullTextField
     @Column(name = "title", nullable = false)
     private String title;
 
     @NotNull
+    @FullTextField
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 

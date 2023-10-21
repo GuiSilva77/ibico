@@ -9,6 +9,6 @@ public interface OportunityService {
     Response<OportunityDto> findOportunities(String query, int pageNo, int pageSize, String sortBy, String sortDir);
     OportunityDto findOportunityById(String Id);
     OportunityDto saveOportunity(OportunityPayload payload, String cpf);
-    OportunityDto updateOportunity(OportunityPayload oportunityDto, String id, String cpf);
-    void deactivateOportunity(String id, String cpf);
+    OportunityDto updateOportunity(OportunityPayload oportunityDto, String id);
+    void deactivateOportunity(String id);
 }
