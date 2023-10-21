@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
@@ -20,6 +21,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 public class JwtValidatorFilter extends OncePerRequestFilter {
+
+    private final RequestMatcher permitRequestMatcher;
+
+    public JwtValidatorFilter(RequestMatcher permitRequestMatcher) {
+        this.permitRequestMatcher = permitRequestMatcher;
+    }
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -27,17 +36,12 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
 
         // check if the header is valid or else return 401
         if (jwt == null || !jwt.startsWith("Bearer ")) {
-            if (request.getMethod().equals("POST") && request.getRequestURI().equals("/v1/oauth/token")) {
+            if (permitRequestMatcher.matches(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            if (request.getMethod().equals("POST") && request.getRequestURI().equals("/v1/users")) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token not found!");
             return;
         }
 
