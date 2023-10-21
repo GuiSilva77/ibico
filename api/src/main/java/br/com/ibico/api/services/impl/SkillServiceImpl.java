@@ -2,8 +2,6 @@ package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Skill;
-import br.com.ibico.api.entities.Skill;
-import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.SkillRepository;

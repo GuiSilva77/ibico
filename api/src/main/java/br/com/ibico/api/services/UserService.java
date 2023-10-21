@@ -1,7 +1,6 @@
 package br.com.ibico.api.services;
 
 import br.com.ibico.api.entities.Response;
-import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.dto.UserGetDto;
 import br.com.ibico.api.entities.dto.UserPutDto;

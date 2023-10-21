@@ -2,9 +2,7 @@ package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Oportunity;
 import br.com.ibico.api.entities.Response;
-import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.OportunityDto;
-import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.payload.OportunityPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.OportunityRepository;
