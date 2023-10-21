@@ -41,17 +41,6 @@ CREATE TABLE skills
     CONSTRAINT pk_skills PRIMARY KEY (id)
 );
 
-CREATE TABLE reviews
-(
-    id           BINARY(16) NOT NULL,
-    review       TEXT       NOT NULL,
-    rating       INT        NOT NULL,
-    created_at   datetime   NOT NULL,
-    user_id      BINARY(16) NOT NULL,
-    oporunity_id BINARY(16) NOT NULL,
-    CONSTRAINT pk_reviews PRIMARY KEY (id)
-);
-
 CREATE TABLE oportunities
 (
     id              BINARY(16)   NOT NULL,
@@ -67,6 +56,17 @@ CREATE TABLE oportunities
     created_at      datetime     NOT NULL,
     posted_by       BINARY(16)   NOT NULL,
     CONSTRAINT pk_oportunities PRIMARY KEY (id)
+);
+
+CREATE TABLE reviews
+(
+    id           BINARY(16) NOT NULL,
+    review       TEXT       NOT NULL,
+    rating       INT        NOT NULL,
+    created_at   datetime   NOT NULL,
+    user_id      BINARY(16) NOT NULL,
+    oporunity_id BINARY(16) NOT NULL,
+    CONSTRAINT pk_reviews PRIMARY KEY (id)
 );
 
 ALTER TABLE oportunities
@@ -96,4 +96,6 @@ ALTER TABLE tb_user_role
 ALTER TABLE tb_user_role
     ADD CONSTRAINT FK_USER_ROLES_ROLES FOREIGN KEY (id_role) REFERENCES roles (id);
 
+INSERT INTO `roles`
+VALUES (1, 'ROLE_ADMIN'), (2, 'ROLE_USER'), (3, 'ROLE_GUEST');
 
