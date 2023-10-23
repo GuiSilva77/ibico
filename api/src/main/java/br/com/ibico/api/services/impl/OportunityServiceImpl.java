@@ -3,6 +3,7 @@ package br.com.ibico.api.services.impl;
 import br.com.ibico.api.entities.Oportunity;
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.dto.OportunityDto;
+import br.com.ibico.api.entities.dto.SkillDto;
 import br.com.ibico.api.entities.payload.OportunityPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.OportunityRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OportunityServiceImpl implements OportunityService {
@@ -84,7 +86,7 @@ public class OportunityServiceImpl implements OportunityService {
         oportunity.setTimeLoad(oportunityDto.timeLoad());
         oportunity.setLocal(oportunityDto.local());
         oportunity.setValue(oportunityDto.value());
-        oportunity.setOccupation(oportunityDto.occupation());
+        oportunity.setNecessarySkills(oportunityDto.necessarySkills().stream().map(SkillDto::toSkill).collect(Collectors.toSet()));
         oportunity.setStatus(oportunityDto.status());
 
         return oportunityRepository.save(oportunity).toOportunityDto();

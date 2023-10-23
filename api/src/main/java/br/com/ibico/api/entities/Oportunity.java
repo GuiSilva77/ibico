@@ -200,12 +200,12 @@ public class Oportunity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Oportunity that = (Oportunity) o;
-        return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(startDateTime, that.startDateTime) && Objects.equals(endDateTime, that.endDateTime) && Objects.equals(timeLoad, that.timeLoad) && Objects.equals(local, that.local) && Objects.equals(value, that.value) && Objects.equals(occupation, that.occupation) && status == that.status && Objects.equals(createdAt, that.createdAt) && Objects.equals(postedBy, that.postedBy);
+        return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(startDateTime, that.startDateTime) && Objects.equals(endDateTime, that.endDateTime) && Objects.equals(timeLoad, that.timeLoad) && Objects.equals(local, that.local) && Objects.equals(value, that.value) && Objects.equals(necessarySkills, that.necessarySkills) && status == that.status && Objects.equals(createdAt, that.createdAt) && Objects.equals(postedBy, that.postedBy);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, startDateTime, endDateTime, timeLoad, local, value, occupation, status, createdAt, postedBy);
+        return Objects.hash(id, title, description, startDateTime, endDateTime, timeLoad, local, value, necessarySkills, status, createdAt, postedBy);
     }
 
     public OportunityDto toOportunityDto() {

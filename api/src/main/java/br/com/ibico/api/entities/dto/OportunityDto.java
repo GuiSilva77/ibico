@@ -1,6 +1,7 @@
 package br.com.ibico.api.entities.dto;
 
 import br.com.ibico.api.entities.Oportunity;
+import br.com.ibico.api.entities.Skill;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.enums.OportunityStatus;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -16,7 +18,7 @@ import java.util.UUID;
 public record OportunityDto(UUID id, @NotNull String title, @NotNull String description,
                             @NotNull LocalDateTime startDateTime, @NotNull LocalDateTime endDateTime,
                             @NotNull String timeLoad, @NotNull String local, @NotNull BigDecimal value,
-                            @NotNull String occupation, @NotNull OportunityStatus status,
+                            @NotNull Set<SkillDto> necessarySkills, @NotNull OportunityStatus status,
                             @NotNull LocalDateTime createdAt, UserDto postedBy) implements Serializable {
     /**
      * DTO for {@link User}
