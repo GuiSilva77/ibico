@@ -63,7 +63,6 @@ public class SkillServiceImpl implements SkillService {
                 new ResourceNotFoundException("Skill", "Name", skillDto.name()));
 
         skill.setName(skillDto.name());
-        skill.setDescription(skillDto.description());
 
         return skillRepository.save(skill).toSkillDto();
     }

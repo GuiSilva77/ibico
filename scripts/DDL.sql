@@ -37,7 +37,6 @@ CREATE TABLE skills
 (
     id            BINARY(16)  NOT NULL,
     name          VARCHAR(50) NOT NULL,
-    `description` VARCHAR(50) NOT NULL,
     CONSTRAINT pk_skills PRIMARY KEY (id)
 );
 

@@ -9,9 +9,9 @@ import java.io.Serializable;
 /**
  * DTO for {@link Skill}
  */
-public record SkillDto(@NotNull @Size(min = 3, max = 50) String name,
-                       @NotNull @Size(min = 3, max = 50) String description) implements Serializable {
+public record SkillDto(@NotNull @Size(min = 3, max = 50) String name
+                      ) implements Serializable {
     public Skill toSkill() {
-        return new Skill(name, description);
+        return new Skill(name);
     }
 }
