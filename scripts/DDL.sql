@@ -68,6 +68,22 @@ CREATE TABLE oportunities
     CONSTRAINT pk_oportunities PRIMARY KEY (id)
 );
 
+CREATE TABLE opportuniy_skills
+(
+    id_opportunity BINARY(16) NOT NULL,
+    id_skills      BINARY(16) NOT NULL,
+    CONSTRAINT pk_opportuniy_skills PRIMARY KEY (id_opportunity, id_skills)
+);
+
+ALTER TABLE oportunities
+    ADD CONSTRAINT FK_OPORTUNITIES_ON_POSTED_BY FOREIGN KEY (posted_by) REFERENCES users (id);
+
+ALTER TABLE opportuniy_skills
+    ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_USERS FOREIGN KEY (id_opportunity) REFERENCES oportunities (id);
+
+ALTER TABLE opportuniy_skills
+    ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_SKILLS FOREIGN KEY (id_skills) REFERENCES skills (id);
+
 ALTER TABLE oportunities
     ADD CONSTRAINT FK_OPORTUNITIES_ON_POSTED_BY FOREIGN KEY (posted_by) REFERENCES users (id);
 

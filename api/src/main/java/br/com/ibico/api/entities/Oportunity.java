@@ -9,8 +9,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Indexed
@@ -53,9 +56,9 @@ public class Oportunity {
     @Column(name = "value", nullable = false)
     private BigDecimal value;
 
-    @NotNull
-    @Column(name = "occupation", nullable = false)
-    private String occupation;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "opportuniy_skills", joinColumns = @JoinColumn(name = "id_opportunity", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_USERS")), inverseJoinColumns = @JoinColumn(name = "id_skills", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_SKILLS")))
+    private Set<Skill> necessarySkills = new LinkedHashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -73,7 +76,7 @@ public class Oportunity {
     public Oportunity() {
     }
 
-    public Oportunity(String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String timeLoad, String local, BigDecimal value, String occupation, OportunityStatus status) {
+    public Oportunity(String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String timeLoad, String local, BigDecimal value, Set<Skill> necessarySkills, OportunityStatus status) {
         this.title = title;
         this.description = description;
         this.startDateTime = startDateTime;
@@ -81,7 +84,7 @@ public class Oportunity {
         this.timeLoad = timeLoad;
         this.local = local;
         this.value = value;
-        this.occupation = occupation;
+        this.necessarySkills = necessarySkills;
         this.status = status;
     }
 
@@ -160,12 +163,12 @@ public class Oportunity {
         this.value = value;
     }
 
-    public String getOccupation() {
-        return occupation;
+    public Set<Skill> getNecessarySkills() {
+        return necessarySkills;
     }
 
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
+    public void setNecessarySkills(Set<Skill> necessarySkills) {
+        this.necessarySkills = necessarySkills;
     }
 
     public OportunityStatus getStatus() {
@@ -215,7 +218,9 @@ public class Oportunity {
                 this.timeLoad,
                 this.local,
                 this.value,
-                this.occupation,
+                this.necessarySkills.stream()
+                        .map(Skill::toSkillDto)
+                        .collect(Collectors.toSet()),
                 this.status,
                 this.createdAt,
                 new OportunityDto.UserDto(

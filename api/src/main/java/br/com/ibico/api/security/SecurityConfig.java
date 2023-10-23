@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(permitRequests).permitAll()
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();
