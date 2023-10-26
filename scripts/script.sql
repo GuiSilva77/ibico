@@ -54,6 +54,7 @@ CREATE TABLE oportunities
     status          VARCHAR(255) NOT NULL,
     created_at      datetime     NOT NULL,
     posted_by       BINARY(16)   NOT NULL,
+    opportunity_status VARCHAR(255) NOT NULL,
     CONSTRAINT pk_oportunities PRIMARY KEY (id)
 );
 

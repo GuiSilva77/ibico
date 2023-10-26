@@ -73,6 +73,12 @@ public class Oportunity {
     @JoinColumn(name = "posted_by", nullable = false)
     private User postedBy;
 
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "opportunity_status", nullable = false)
+    private OportunityStatus oportunityStatus;
+
     public Oportunity() {
     }
 
