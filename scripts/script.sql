@@ -76,6 +76,21 @@ CREATE TABLE opportuniy_skills
     CONSTRAINT pk_opportuniy_skills PRIMARY KEY (id_opportunity, id_skills)
 );
 
+CREATE TABLE candidatorships
+(
+    id               BINARY(16) NOT NULL,
+    candidature_date datetime   NOT NULL,
+    user_id          BINARY(16) NOT NULL,
+    vacancy_id       BINARY(16) NOT NULL,
+    CONSTRAINT pk_candidatorships PRIMARY KEY (id)
+);
+
+ALTER TABLE candidatorships
+    ADD CONSTRAINT FK_CANDIDATORSHIPS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
+ALTER TABLE candidatorships
+    ADD CONSTRAINT FK_CANDIDATORSHIPS_ON_VACANCY FOREIGN KEY (vacancy_id) REFERENCES oportunities (id);
+
 ALTER TABLE opportuniy_skills
     ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_USERS FOREIGN KEY (id_opportunity) REFERENCES oportunities (id);
 
