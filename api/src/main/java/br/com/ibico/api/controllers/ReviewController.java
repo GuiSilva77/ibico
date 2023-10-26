@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,7 +57,7 @@ public class ReviewController {
 
     @Operation(summary = "Salva uma avaliação")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Avaliação salva"),
+            @ApiResponse(responseCode = "201", description = "Avaliação salva"),
             @ApiResponse(responseCode = "400", description = "Avaliação inválida", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
@@ -64,7 +65,7 @@ public class ReviewController {
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<ReviewDto> saveReview(@Valid @RequestBody ReviewPayload reviewPayload) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResponseEntity.ok(reviewService.saveReview(reviewPayload, (String)authentication.getPrincipal()));
+        return new ResponseEntity<>(reviewService.saveReview(reviewPayload, (String)authentication.getPrincipal()), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Atualiza uma avaliação")

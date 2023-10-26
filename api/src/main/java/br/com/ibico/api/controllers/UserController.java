@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,7 +77,7 @@ public class UserController {
 
     @Operation(summary = "Salva um usuário")
     @ApiResponses( value = {
-            @ApiResponse(responseCode = "200", description = "Retorna o usuário salvo"),
+            @ApiResponse(responseCode = "201", description = "Retorna o usuário salvo"),
             @ApiResponse(responseCode = "400", description = "Requisição inválida", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
@@ -86,7 +87,7 @@ public class UserController {
     public ResponseEntity<UserDto> saveUser(@Valid @RequestBody UserPayload userPayload) {
         UserDto savedUser = userService.saveUser(userPayload);
 
-        return ResponseEntity.ok(savedUser);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
     @SecurityRequirement(name = "bearerAuth")

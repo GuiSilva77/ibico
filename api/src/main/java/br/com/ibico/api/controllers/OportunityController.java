@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,7 +63,7 @@ public class OportunityController {
 
     @Operation(summary = "Cria uma nova vaga")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Vaga criada com sucesso"),
+            @ApiResponse(responseCode = "201", description = "Vaga criada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Erro na requisição", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
@@ -74,7 +75,7 @@ public class OportunityController {
         String cpf = (String)authentication.getPrincipal();
         OportunityDto savedOportunity = oportunityService.saveOportunity(oportunityPayload, cpf);
 
-        return ResponseEntity.ok(savedOportunity);
+        return new ResponseEntity<>(savedOportunity, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Atualiza uma vaga")

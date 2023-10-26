@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,14 +44,14 @@ public class SkillsController {
 
     @Operation(summary = "Adiciona uma nova habilidade")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Habilidade adicionada com sucesso"),
+            @ApiResponse(responseCode = "201", description = "Habilidade adicionada com sucesso"),
             @ApiResponse(responseCode = "400", description = "Erro de validação", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<SkillDto> addSkill(@Valid @RequestBody SkillDto skillDto) {
-        return ResponseEntity.ok(skillService.addSkill(skillDto));
+        return new ResponseEntity<>(skillService.addSkill(skillDto),  HttpStatus.CREATED);
     }
 
 
