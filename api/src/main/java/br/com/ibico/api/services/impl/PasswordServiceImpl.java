@@ -13,6 +13,8 @@ import br.com.ibico.api.repositories.PasswordResetRequestRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.PasswordService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class PasswordServiceImpl implements PasswordService {
     private final PasswordResetCodeRepository passwordResetCodeRepository;
     private final PasswordResetRequestRepository passwordResetRequestRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Logger logger = LoggerFactory.getLogger(PasswordServiceImpl.class);
 
     public PasswordServiceImpl(UserRepository userRepository, PasswordResetCodeRepository passwordResetCodeRepository, PasswordResetRequestRepository passwordResetRequestRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -45,6 +48,8 @@ public class PasswordServiceImpl implements PasswordService {
                 String.valueOf(random.nextInt(999999)),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusMinutes(PasswordResetCode.EXPIRATION_TIME));
+
+        logger.info("Password reset code generated: " + passwordResetCode.getCode());
 
         return passwordResetCodeRepository.save(passwordResetCode).toDto();
     }
