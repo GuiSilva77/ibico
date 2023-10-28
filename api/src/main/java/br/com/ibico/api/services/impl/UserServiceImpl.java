@@ -75,6 +75,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto saveUser(UserPayload payload) {
         User user = payload.toUser();
 
