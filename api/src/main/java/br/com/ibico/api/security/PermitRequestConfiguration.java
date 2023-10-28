@@ -17,7 +17,8 @@ public class PermitRequestConfiguration {
                 new AntPathRequestMatcher("/v1/oauth/**", HttpMethod.POST.toString()),
                 new AntPathRequestMatcher("/v1/swagger.html"),
                 new AntPathRequestMatcher("/v1/swagger-ui/**"),
-                new AntPathRequestMatcher("/v3/api-docs/**")
+                new AntPathRequestMatcher("/v3/api-docs/**"),
+                new AntPathRequestMatcher("/v1/password/**")
         );
     }
 }

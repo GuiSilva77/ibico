@@ -85,6 +85,36 @@ CREATE TABLE candidatorships
     CONSTRAINT pk_candidatorships PRIMARY KEY (id)
 );
 
+CREATE TABLE password_reset_code
+(
+    request_id BINARY(16)   NOT NULL,
+    user_id    BINARY(16)   NULL,
+    code       VARCHAR(255) NOT NULL,
+    created_at datetime     NOT NULL,
+    expires_at datetime     NOT NULL,
+    CONSTRAINT pk_password_reset_code PRIMARY KEY (request_id)
+);
+
+CREATE TABLE password_reset_requests
+(
+    request_id      BINARY(16)   NOT NULL,
+    code_id         BINARY(16)   NULL,
+    access_token    VARCHAR(255) NOT NULL,
+    created_at      datetime     NOT NULL,
+    expiration_date datetime     NOT NULL,
+    used            BIT(1)       NOT NULL,
+    CONSTRAINT pk_password_reset_requests PRIMARY KEY (request_id)
+);
+
+ALTER TABLE password_reset_requests
+    ADD CONSTRAINT UQ_PASSWORD_RESET_REQUEST_ACCESS_TOKEN UNIQUE (access_token);
+
+ALTER TABLE password_reset_requests
+    ADD CONSTRAINT FK_PASSWORD_RESET_REQUESTS_ON_CODE FOREIGN KEY (code_id) REFERENCES password_reset_code (request_id);
+
+ALTER TABLE password_reset_code
+    ADD CONSTRAINT FK_PASSWORD_RESET_CODE_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+
 ALTER TABLE candidatorships
     ADD CONSTRAINT FK_CANDIDATORSHIPS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
