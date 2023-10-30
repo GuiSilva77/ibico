@@ -2,6 +2,7 @@ package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Role;
+import br.com.ibico.api.entities.Skill;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.dto.UserGetDto;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -45,12 +47,12 @@ public class UserServiceImpl implements UserService {
         SearchSession searchSession = Search.session(entityManager);
 
         SearchResult<User> result = searchSession.search(User.class)
-                .where(f -> f.wildcard().fields("name", "username").matching(query + "*"))
+                .where(f -> f.match().fields("name", "username").matching(query).fuzzy(2))
                 .fetch(pageNo * pageSize, pageSize);
 
         List<UserDto> users = result.hits().stream()
                 .map(user -> {
-                    if (user.isActive()) return null;
+                    if (!user.isActive()) return null;
                     return user.toUserDtoMinusCPF();
                 })
                 .toList();
@@ -75,7 +77,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public UserDto saveUser(UserPayload payload) {
         User user = payload.toUser();
 
@@ -102,7 +103,15 @@ public class UserServiceImpl implements UserService {
         user.setActive(userDto.active());
         user.setImgURL(userDto.imgURL());
         user.setTelephone(userDto.telephone());
-        user.setSkills(userDto.toUser().getSkills());
+
+        Set<Skill> skills = userDto.skills().stream().map(skill -> {
+            if (!skillRepository.existsByName(skill.name()))
+                return skillRepository.save(new Skill(skill.name()));
+
+            return skillRepository.findByName(skill.name()).orElseThrow(() -> new ResourceNotFoundException("Skill", "name", skill.name()));
+        }).collect(Collectors.toSet());
+
+        user.setSkills(skills);
 
         User savedUser = userRepository.save(user);
 
