@@ -14,6 +14,8 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SkillServiceImpl implements SkillService {
@@ -65,5 +67,16 @@ public class SkillServiceImpl implements SkillService {
         skill.setName(skillDto.name());
 
         return skillRepository.save(skill).toSkillDto();
+    }
+
+    @Override
+    public Set<Skill> convertToSkills(Set<SkillDto> skillDtos) {
+        return skillDtos.stream().map(dto -> {
+            if (!skillRepository.existsByName(dto.name()))
+                return skillRepository.save(new Skill(dto.name()));
+
+            return skillRepository.findByName(dto.name()).orElseThrow(
+                    () -> new ResourceNotFoundException("Skill", "name", dto.name())
+            );}).collect(Collectors.toSet());
     }
 }

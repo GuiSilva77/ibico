@@ -2,16 +2,14 @@ package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Role;
-import br.com.ibico.api.entities.Skill;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.dto.UserGetDto;
 import br.com.ibico.api.entities.dto.UserPutDto;
 import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
-import br.com.ibico.api.repositories.RolesRepsitory;
-import br.com.ibico.api.repositories.SkillRepository;
 import br.com.ibico.api.repositories.UserRepository;
+import br.com.ibico.api.services.SkillService;
 import br.com.ibico.api.services.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -23,20 +21,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final SkillRepository skillRepository;
+    private final SkillService skillService;
     private final PasswordEncoder passwordEncoder;
     private final EntityManager entityManager;
 
     public UserServiceImpl(UserRepository userRepository,
-                           SkillRepository skillRepository, RolesRepsitory rolesRepsitory, SkillRepository skillRepository1, PasswordEncoder passwordEncoder, EntityManager entityManager) {
+                           SkillService skillService, PasswordEncoder passwordEncoder, EntityManager entityManager) {
         this.userRepository = userRepository;
-        this.skillRepository = skillRepository1;
+        this.skillService = skillService;
         this.passwordEncoder = passwordEncoder;
         this.entityManager = entityManager;
     }
@@ -83,10 +80,7 @@ public class UserServiceImpl implements UserService {
         user.setPasswd(passwordEncoder.encode(user.getPasswd()));
         user.setRoles(Set.of(new Role(2L, "ROLE_USER")));
 
-        user.getSkills().forEach(skill -> {
-            if (!skillRepository.existsByName(skill.getName()))
-                skillRepository.save(skill);
-        });
+        user.setSkills(skillService.convertToSkills(payload.skills()));
 
         User savedUser = userRepository.save(user);
 
@@ -104,14 +98,7 @@ public class UserServiceImpl implements UserService {
         user.setImgURL(userDto.imgURL());
         user.setTelephone(userDto.telephone());
 
-        Set<Skill> skills = userDto.skills().stream().map(skill -> {
-            if (!skillRepository.existsByName(skill.name()))
-                return skillRepository.save(new Skill(skill.name()));
-
-            return skillRepository.findByName(skill.name()).orElseThrow(() -> new ResourceNotFoundException("Skill", "name", skill.name()));
-        }).collect(Collectors.toSet());
-
-        user.setSkills(skills);
+        user.setSkills(skillService.convertToSkills(userDto.skills()));
 
         User savedUser = userRepository.save(user);
 
