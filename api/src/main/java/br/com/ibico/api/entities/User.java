@@ -106,17 +106,16 @@ public class User {
         this.skills = skills;
     }
 
-    public User(String name, String username, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone, Set<Skill> skills) {
+    public User(String name, String username, LocalDateTime dateOfCreation, String imgURL, boolean active, String telephone) {
         this.name = name;
         this.username = username;
         this.dateOfCreation = dateOfCreation;
         this.imgURL = imgURL;
         this.active = active;
         this.telephone = telephone;
-        this.skills = skills;
     }
 
-    public User(String cpf, String name, String username, String passwd, String imgURL, boolean active, String telephone, Set<Skill> collect) {
+    public User(String cpf, String name, String username, String passwd, String imgURL, boolean active, String telephone, Set<Skill> skills) {
         this.cpf = cpf;
         this.name = name;
         this.username = username;
@@ -124,7 +123,17 @@ public class User {
         this.imgURL = imgURL;
         this.active = active;
         this.telephone = telephone;
-        this.skills = collect;
+        this.skills = skills;
+    }
+
+    public User(String cpf, String name, String username, String passwd, String imgURL, boolean active, String telephone) {
+        this.cpf = cpf;
+        this.name = name;
+        this.username = username;
+        this.passwd = passwd;
+        this.imgURL = imgURL;
+        this.active = active;
+        this.telephone = telephone;
     }
 
     public static boolean validateCpf(String cpf) {

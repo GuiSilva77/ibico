@@ -15,8 +15,7 @@ Content-Type: application/json
   "telephone": "12345678901",
   "skills": [
     {
-      "name": "Cozinhar",
-      "description": "Cozinhar"
+      "name": "Cozinhar"
     }
   ]
 }

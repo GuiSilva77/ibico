@@ -1,13 +1,12 @@
 package br.com.ibico.api.entities.payload;
 
 import br.com.ibico.api.entities.User;
+import br.com.ibico.api.entities.dto.SkillDto;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * DTO for {@link br.com.ibico.api.entities.User}
@@ -19,9 +18,9 @@ public record UserPayload(
         @NotNull(message = "Password must not be null") @Size(message = "Password must contain at least 8 characters", min = 8) String passwd,
         @NotNull(message = "Image URL must not be null") String imgURL, boolean active,
         @NotNull(message = "Telephone must not be null") String telephone,
-        @Null Set<SkillsPayload> skills) implements Serializable {
+        @NotNull Set<SkillDto> skills) implements Serializable {
     public User toUser() {
-        return new User(cpf, name, username, passwd, imgURL, active, telephone, skills.stream().map(SkillsPayload::toSkill).collect(Collectors.toSet()));
+        return new User(cpf, name, username, passwd, imgURL, active, telephone);
     }
 }
 
