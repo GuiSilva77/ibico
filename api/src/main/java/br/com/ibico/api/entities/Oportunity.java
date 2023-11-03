@@ -56,7 +56,7 @@ public class Oportunity {
     @Column(name = "value", nullable = false)
     private BigDecimal value;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "opportuniy_skills", joinColumns = @JoinColumn(name = "id_opportunity", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_USERS")), inverseJoinColumns = @JoinColumn(name = "id_skills", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_SKILLS")))
     private Set<Skill> necessarySkills = new LinkedHashSet<>();
 
@@ -72,12 +72,6 @@ public class Oportunity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "posted_by", nullable = false)
     private User postedBy;
-
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "opportunity_status", nullable = false)
-    private OportunityStatus oportunityStatus;
 
     public Oportunity() {
     }

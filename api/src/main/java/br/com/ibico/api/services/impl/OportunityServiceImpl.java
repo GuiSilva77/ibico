@@ -3,22 +3,22 @@ package br.com.ibico.api.services.impl;
 import br.com.ibico.api.entities.Oportunity;
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.dto.OportunityDto;
-import br.com.ibico.api.entities.dto.SkillDto;
+import br.com.ibico.api.entities.enums.OportunityStatus;
 import br.com.ibico.api.entities.payload.OportunityPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.OportunityRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.OportunityService;
+import br.com.ibico.api.services.SkillService;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class OportunityServiceImpl implements OportunityService {
@@ -28,11 +28,14 @@ public class OportunityServiceImpl implements OportunityService {
     private final UserRepository userRepository;
 
     private final EntityManager entityManager;
+    private final SkillService skillService;
 
-    public OportunityServiceImpl(OportunityRepository oportunityRepository, UserRepository userRepository, EntityManager entityManager) {
+    public OportunityServiceImpl(OportunityRepository oportunityRepository, UserRepository userRepository, EntityManager entityManager,
+                                 SkillService skillService) {
         this.oportunityRepository = oportunityRepository;
         this.userRepository = userRepository;
         this.entityManager = entityManager;
+        this.skillService = skillService;
     }
 
     @Override
@@ -71,23 +74,29 @@ public class OportunityServiceImpl implements OportunityService {
         oportunity.setPostedBy(userRepository.findByCpf(cpf)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "cpf", "")));
 
+        oportunity.setNecessarySkills(skillService.convertToSkills(payload.necessarySkills()));
+
+        oportunity.setStatus(OportunityStatus.valueOf(payload.status()));
+
         return oportunityRepository.save(oportunity).toOportunityDto();
     }
 
     @Override
-    public OportunityDto updateOportunity(OportunityPayload oportunityDto, String id) {
+    public OportunityDto updateOportunity(OportunityPayload payload, String id) {
         Oportunity oportunity = oportunityRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Oportunity", "Id", id));
 
-        oportunity.setTitle(oportunityDto.title());
-        oportunity.setDescription(oportunityDto.description());
-        oportunity.setStartDateTime(oportunityDto.startDateTime());
-        oportunity.setEndDateTime(oportunityDto.endDateTime());
-        oportunity.setTimeLoad(oportunityDto.timeLoad());
-        oportunity.setLocal(oportunityDto.local());
-        oportunity.setValue(oportunityDto.value());
-        oportunity.setNecessarySkills(oportunityDto.necessarySkills().stream().map(SkillDto::toSkill).collect(Collectors.toSet()));
-        oportunity.setStatus(oportunityDto.status());
+        oportunity.setTitle(payload.title());
+        oportunity.setDescription(payload.description());
+        oportunity.setStartDateTime(payload.startDateTime());
+        oportunity.setEndDateTime(payload.endDateTime());
+        oportunity.setTimeLoad(payload.timeLoad());
+        oportunity.setLocal(payload.local());
+        oportunity.setValue(payload.value());
+
+        oportunity.setNecessarySkills(skillService.convertToSkills(payload.necessarySkills()));
+        
+        oportunity.setStatus(OportunityStatus.valueOf(payload.status()));
 
         return oportunityRepository.save(oportunity).toOportunityDto();
     }

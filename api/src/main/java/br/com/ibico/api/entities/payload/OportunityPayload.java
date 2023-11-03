@@ -24,8 +24,8 @@ public record OportunityPayload(@NotNull(message = "Title must not be null") Str
                                 @NotNull(message = "Local must not be null") String local,
                                 @NotNull(message = "Value must not be null") @Positive(message = "Value must be positive") BigDecimal value,
                                 @NotNull(message = "Opportunity must have at least one skill")Set<SkillDto>necessarySkills,
-                                @NotNull(message = "Status must not be null") OportunityStatus status) implements Serializable {
+                                @NotNull(message = "Status must not be null") String status) implements Serializable {
     public Oportunity toOportunity() {
-        return new Oportunity(title, description, startDateTime, endDateTime, timeLoad, local, value, necessarySkills.stream().map(SkillDto::toSkill).collect(Collectors.toSet()), status);
+        return new Oportunity(title, description, startDateTime, endDateTime, timeLoad, local, value, necessarySkills.stream().map(SkillDto::toSkill).collect(Collectors.toSet()), OportunityStatus.valueOf(status));
     }
 }
