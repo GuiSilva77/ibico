@@ -15,7 +15,7 @@ public record UserPayload(
         @NotNull(message = "CPF must not be null") @Size(message = "CPF must contain 11 characters", min = 11, max = 11) String cpf,
         @NotNull(message = "Name must not be null") String name,
         @NotNull(message = "Username must not be null") String username,
-        @NotNull(message = "Password must not be null") @Size(message = "Password must contain at least 8 characters", min = 8) String passwd,
+        String passwd,
         @NotNull(message = "Image URL must not be null") String imgURL, boolean active,
         @NotNull(message = "Telephone must not be null") String telephone,
         @NotNull Set<SkillDto> skills) implements Serializable {

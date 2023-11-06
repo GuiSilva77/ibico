@@ -8,7 +8,9 @@ import br.com.ibico.api.entities.dto.UserGetDto;
 import br.com.ibico.api.entities.dto.UserPutDto;
 import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
+import br.com.ibico.api.exceptions.ResourceNotValidException;
 import br.com.ibico.api.repositories.UserRepository;
+import br.com.ibico.api.services.ReviewService;
 import br.com.ibico.api.services.SkillService;
 import br.com.ibico.api.services.UserService;
 import jakarta.persistence.EntityManager;
@@ -77,6 +79,9 @@ public class UserServiceImpl implements UserService {
     public UserDto saveUser(UserPayload payload) {
         User user = payload.toUser();
 
+        if (payload.passwd().isEmpty() || payload.passwd().length() < 8 || !payload.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+            throw new ResourceNotValidException("password is empty or not valid");
+
         user.setPasswd(passwordEncoder.encode(user.getPasswd()));
         user.setRoles(Set.of(new Role(2L, "ROLE_USER")));
 
@@ -93,6 +98,7 @@ public class UserServiceImpl implements UserService {
                 new ResourceNotFoundException("User", "CPF", userDto.cpf())
         );
 
+        user.setUsername(userDto.username());
         user.setName(userDto.name());
         user.setActive(userDto.active());
         user.setImgURL(userDto.imgURL());
