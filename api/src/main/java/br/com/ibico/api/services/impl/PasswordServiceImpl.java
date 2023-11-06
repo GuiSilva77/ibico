@@ -1,5 +1,6 @@
 package br.com.ibico.api.services.impl;
 
+import br.com.ibico.api.constraints.SmsConstraints;
 import br.com.ibico.api.entities.PasswordResetCode;
 import br.com.ibico.api.entities.PasswordResetRequest;
 import br.com.ibico.api.entities.User;
@@ -12,6 +13,7 @@ import br.com.ibico.api.repositories.PasswordResetCodeRepository;
 import br.com.ibico.api.repositories.PasswordResetRequestRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.PasswordService;
+import br.com.ibico.api.services.SMSService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,14 @@ public class PasswordServiceImpl implements PasswordService {
     private final PasswordResetRequestRepository passwordResetRequestRepository;
     private final PasswordEncoder passwordEncoder;
     private final Logger logger = LoggerFactory.getLogger(PasswordServiceImpl.class);
+    private final SMSService smsService;
 
-    public PasswordServiceImpl(UserRepository userRepository, PasswordResetCodeRepository passwordResetCodeRepository, PasswordResetRequestRepository passwordResetRequestRepository, PasswordEncoder passwordEncoder) {
+    public PasswordServiceImpl(UserRepository userRepository, PasswordResetCodeRepository passwordResetCodeRepository, PasswordResetRequestRepository passwordResetRequestRepository, PasswordEncoder passwordEncoder, SMSService smsService) {
         this.userRepository = userRepository;
         this.passwordResetCodeRepository = passwordResetCodeRepository;
         this.passwordResetRequestRepository = passwordResetRequestRepository;
         this.passwordEncoder = passwordEncoder;
+        this.smsService = smsService;
     }
 
     @Override
@@ -49,7 +53,12 @@ public class PasswordServiceImpl implements PasswordService {
                 LocalDateTime.now(),
                 LocalDateTime.now().plusMinutes(PasswordResetCode.EXPIRATION_TIME));
 
-        logger.info("Password reset code generated: " + passwordResetCode.getCode());
+        try {
+            smsService.sendSMS(String.format(SmsConstraints.SMS_PASSWORD_RESET_MESSAGE, user.getName(), passwordResetCode.getCode()), user.getTelephone());
+            logger.info("SMS sent to {}", user.getTelephone());
+        } catch (Exception e) {
+            logger.error("Error while sending SMS", e);
+        }
 
         return passwordResetCodeRepository.save(passwordResetCode).toDto();
     }
