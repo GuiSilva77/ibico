@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/v1/candidatures")
 public class CandidatureController {
 
     private final CandidatureService candidatureService;
@@ -33,27 +32,29 @@ public class CandidatureController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @GetMapping(produces = "application/json")
-    public ResponseEntity<Response<CandidatureDto>> findAllCandidatures(@RequestParam(value = "query", defaultValue = "", required = false) String query,
-                                                                        @RequestParam(value = "findBy", defaultValue = "self", required = true) String findBy,
+    @GetMapping(path = "/v1/candidatures", produces = "application/json")
+    public ResponseEntity<Response<CandidatureDto>> findAllCandidatures(
                                                                         @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                                                         @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
                                                                         @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
                                                                         @RequestParam(value = "sortDir", defaultValue = "ASC", required = false) String sortDir) {
 
-        if (findBy.equals("self")) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String cpf = (String) authentication.getPrincipal();
 
             return ResponseEntity.ok(candidatureService.findCandidatures(cpf, pageNo, pageSize, sortBy, sortDir));
-        }
-
-        if (findBy.equals("oportunity")) {
-            return ResponseEntity.ok(candidatureService.findCandidaturesByOportunityId(query, pageNo, pageSize, sortBy, sortDir));
-        }
-
-        return ResponseEntity.badRequest().build();
     }
+
+    @GetMapping(path = "/v1/opportunities/{id}/candidates", produces = "application/json")
+    public ResponseEntity<Response<CandidatureDto>> findAllCandidaturesByOpportunityId(@Validated @PathVariable(name = "id") String opportunityId,
+                                                                        @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+                                                                        @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+                                                                        @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
+                                                                        @RequestParam(value = "sortDir", defaultValue = "ASC", required = false) String sortDir) {
+
+        return ResponseEntity.ok(candidatureService.findCandidaturesByOpportunityId(opportunityId, pageNo, pageSize, sortBy, sortDir));
+    }
+
 
     @Operation(summary = "Busca uma candidatura pelo id")
     @ApiResponses(value = {
@@ -63,7 +64,7 @@ public class CandidatureController {
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     }
     )
-    @GetMapping(path = "{id}", produces = "application/json")
+    @GetMapping(path = "/v1/candidatures/{id}", produces = "application/json")
     public ResponseEntity<CandidatureDto> findCandidatureById(@Validated @PathVariable(name = "id") String candidatureId) {
         return ResponseEntity.ok(candidatureService.findCandidatureById(candidatureId));
     }
@@ -76,12 +77,12 @@ public class CandidatureController {
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     }
     )
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<CandidatureDto> createCandidature(@RequestParam(value = "oportunityId", defaultValue = "", required = true) String oportunityId) {
+    @PostMapping(path = "/v1/candidatures", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<CandidatureDto> createCandidature(@RequestParam(value = "opportunityId", defaultValue = "", required = true) String opportunityId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String cpf = (String) authentication.getPrincipal();
 
-        return ResponseEntity.ok(candidatureService.createCandidature(cpf, oportunityId));
+        return ResponseEntity.ok(candidatureService.createCandidature(cpf, opportunityId));
     }
 
     @Operation(summary = "Deleta uma candidatura")
@@ -90,7 +91,7 @@ public class CandidatureController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @DeleteMapping("{id}")
+    @DeleteMapping(path = "/v1/candidatures/{id}")
     public ResponseEntity deleteCandidature(@Validated @PathVariable(name = "id") String id) {
 
         candidatureService.deleteCandidature(id);

@@ -6,6 +6,7 @@ import br.com.ibico.api.entities.Candidature;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.CandidatureDto;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
+import br.com.ibico.api.exceptions.UnauthorizedException;
 import br.com.ibico.api.repositories.CandidatureRepository;
 import br.com.ibico.api.repositories.OpportunityRepository;
 import br.com.ibico.api.repositories.UserRepository;
@@ -13,6 +14,8 @@ import br.com.ibico.api.services.CandidatureService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

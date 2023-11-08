@@ -106,6 +106,10 @@ CREATE TABLE password_reset_requests
     CONSTRAINT pk_password_reset_requests PRIMARY KEY (request_id)
 );
 
+ALTER TABLE opportunities
+    ADD CONSTRAINT FK_OPPORTUNITIES_ON_SELECTED_CANDIDATE FOREIGN KEY (selected_candidate) REFERENCES users (id);
+
+
 ALTER TABLE password_reset_requests
     ADD CONSTRAINT UQ_PASSWORD_RESET_REQUEST_ACCESS_TOKEN UNIQUE (access_token);
 

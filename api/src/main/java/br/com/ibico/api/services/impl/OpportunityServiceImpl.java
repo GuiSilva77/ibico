@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Service
 public class OpportunityServiceImpl implements OpportunityService {
 
@@ -115,4 +117,22 @@ public class OpportunityServiceImpl implements OpportunityService {
 
         opportunityRepository.save(opportunity);
     }
+
+    @Override
+    public void selectCandidate(String opportunityId, String candidateUsername) {
+        Opportunity opportunity = opportunityRepository.findById(UUID.fromString(opportunityId))
+                .orElseThrow(() -> new ResourceNotFoundException("Opportunity", "Id", opportunityId));
+
+        if (opportunity.getStatus() != OpportunityStatus.CREATED)
+            throw new IllegalArgumentException("Opportunity is not open, hence you cannot select a candidate");
+
+        opportunity.setSelectedCandidate(userRepository.findByUsername(candidateUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", candidateUsername)));
+
+        opportunity.setStatus(OpportunityStatus.CLOSED);
+
+        opportunityRepository.save(opportunity);
+    }
+
+
 }

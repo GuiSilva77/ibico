@@ -1,6 +1,7 @@
 package br.com.ibico.api.services.impl;
 
 import br.com.ibico.api.entities.Response;
+import br.com.ibico.api.entities.Review;
 import br.com.ibico.api.entities.Role;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.UserDto;
@@ -10,7 +11,6 @@ import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.exceptions.ResourceNotValidException;
 import br.com.ibico.api.repositories.UserRepository;
-import br.com.ibico.api.services.ReviewService;
 import br.com.ibico.api.services.SkillService;
 import br.com.ibico.api.services.UserService;
 import jakarta.persistence.EntityManager;

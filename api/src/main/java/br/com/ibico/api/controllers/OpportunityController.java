@@ -106,4 +106,19 @@ public class OpportunityController {
 
         return ResponseEntity.ok("Vaga apagada com sucesso!");
     }
+
+    @Operation(summary = "Seleciona um candidato para uma vaga")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Candidato selecionado com sucesso", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "400", description = "Erro na requisição", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping(path = "{opportunityId}/candidates/{candidateUsername}", produces = "plain/text")
+    public ResponseEntity<String> selectCandidate(@Validated @PathVariable(name="opportunityId") String opportunityId,
+                                                  @Validated @PathVariable(name="candidateUsername") String candidateUsername) {
+        opportunityService.selectCandidate(opportunityId, candidateUsername);
+
+        return ResponseEntity.ok("Candidato selecionado com sucesso!");
+    }
 }

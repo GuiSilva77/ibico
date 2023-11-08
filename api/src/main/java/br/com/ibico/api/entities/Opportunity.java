@@ -1,7 +1,7 @@
 package br.com.ibico.api.entities;
 
-import br.com.ibico.api.entities.dto.OportunityDto;
-import br.com.ibico.api.entities.enums.OportunityStatus;
+import br.com.ibico.api.entities.dto.OpportunityDto;
+import br.com.ibico.api.entities.enums.OpportunityStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 @Entity
 @Indexed
 @Table(
-        name= "oportunities"
+        name= "opportunities"
 )
-public class Oportunity {
+public class Opportunity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -101,6 +101,14 @@ public class Oportunity {
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
         }
+    }
+
+    public User getSelectedCandidate() {
+        return selectedCandidate;
+    }
+
+    public void setSelectedCandidate(User selectedCandidate) {
+        this.selectedCandidate = selectedCandidate;
     }
 
     public UUID getId() {
