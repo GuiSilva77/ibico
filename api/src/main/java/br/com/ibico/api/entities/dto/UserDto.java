@@ -14,6 +14,6 @@ import java.util.Set;
 @Schema(name = "UserDto", description = "DTO for User")
 public record UserDto(@NotNull @Size(max = 11) String cpf, @NotNull String name, @NotNull String username,@NotNull LocalDateTime dateOfCreation,
                       @NotNull String imgURL, boolean active, @NotNull String telephone,
-                      Set<SkillDto> skills) implements Serializable {
+                      Set<SkillDto> skills, double avgRating) implements Serializable {
 }
 

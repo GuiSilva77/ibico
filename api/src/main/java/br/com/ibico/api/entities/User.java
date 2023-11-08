@@ -73,12 +73,11 @@ public class User {
 
     @IndexedEmbedded
     @OneToMany(mappedBy = "postedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Oportunity> oportunitiesPosted = new LinkedHashSet<>();
+    private Set<Opportunity> opportunitiesPosted = new LinkedHashSet<>();
 
     @IndexedEmbedded
     @OneToMany(mappedBy = "reviewer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Review> reviews = new LinkedHashSet<>();
-
 
     public User() {
     }
@@ -145,8 +144,8 @@ public class User {
         }
 
         // Verify if all digits are equal
-        boolean todosDigitosIguais = cpf.matches("(\\d)\\1{10}");
-        if (todosDigitosIguais) {
+        boolean allDigitsEquals = cpf.matches("(\\d)\\1{10}");
+        if (allDigitsEquals) {
             return false;
         }
 
@@ -155,13 +154,13 @@ public class User {
         for (int i = 0; i < 9; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
         }
-        int primeiroDigito = 11 - (soma % 11);
-        if (primeiroDigito > 9) {
-            primeiroDigito = 0;
+        int firstDigit = 11 - (soma % 11);
+        if (firstDigit > 9) {
+            firstDigit = 0;
         }
 
         // verify the first verification digit
-        if (Character.getNumericValue(cpf.charAt(9)) != primeiroDigito) {
+        if (Character.getNumericValue(cpf.charAt(9)) != firstDigit) {
             return false;
         }
 
@@ -170,13 +169,13 @@ public class User {
         for (int i = 0; i < 10; i++) {
             soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
         }
-        int segundoDigito = 11 - (soma % 11);
-        if (segundoDigito > 9) {
-            segundoDigito = 0;
+        int secondDigit = 11 - (soma % 11);
+        if (secondDigit > 9) {
+            secondDigit = 0;
         }
 
         // Verify the second verification digit
-        return Character.getNumericValue(cpf.charAt(10)) == segundoDigito;
+        return Character.getNumericValue(cpf.charAt(10)) == secondDigit;
     }
 
     @PrePersist
@@ -232,10 +231,6 @@ public class User {
         return dateOfCreation;
     }
 
-    public void setDateOfCreation(LocalDateTime dateOfCreation) {
-        this.dateOfCreation = dateOfCreation;
-    }
-
     public String getImgURL() {
         return imgURL;
     }
@@ -269,15 +264,19 @@ public class User {
     }
 
     public UserDto toUserDto() {
-        return new UserDto(this.cpf, this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
+        return new UserDto(this.cpf, this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()), 0);
     }
 
     public UserPutDto toUserPutDto() {
         return new UserPutDto(this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
     }
 
-    public UserDto toUserDtoMinusCPF() {
-        return new UserDto("", this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()));
+    public UserDto toUserDtoMinusCPF(double avgRating) {
+        return new UserDto("", this.name, this.username, this.dateOfCreation, this.imgURL, this.active, this.telephone, this.skills.stream().map(Skill::toSkillDto).collect(Collectors.toSet()), avgRating);
+    }
+
+    public Set<Review> getReviews() {
+        return reviews;
     }
 
     public Set<Role> getRoles() {
@@ -295,8 +294,8 @@ public class User {
                 skills.stream()
                         .map(Skill::toSkillDto)
                         .collect(Collectors.toSet()),
-                oportunitiesPosted.stream()
-                        .map(Oportunity::toOportunityDto)
+                opportunitiesPosted.stream()
+                        .map(Opportunity::toOpportunityDto)
                         .collect(Collectors.toSet()),
                 reviews.stream()
                         .map(Review::toReviewDto)

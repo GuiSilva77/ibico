@@ -1,6 +1,6 @@
 package br.com.ibico.api.repositories;
 
-import br.com.ibico.api.entities.Review;
+import br.com.ibico.api.entities.Opportunity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,8 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, UUID> {
-    Page<Review> findAllByOpportunity_Id(UUID id, Pageable pageable);
-
-    Set<Review> findAllByOpportunity_PostedBy_Id(UUID id);
+public interface OpportunityRepository extends JpaRepository<Opportunity, UUID> {
+    Page<Opportunity> findByTitle(String title, Pageable pageable);
 }

@@ -40,7 +40,7 @@ CREATE TABLE skills
     CONSTRAINT pk_skills PRIMARY KEY (id)
 );
 
-CREATE TABLE oportunities
+CREATE TABLE opportunities
 (
     id              BINARY(16)   NOT NULL,
     title           VARCHAR(255) NOT NULL,
@@ -53,7 +53,9 @@ CREATE TABLE oportunities
     status          VARCHAR(255) NOT NULL,
     created_at      datetime     NOT NULL,
     posted_by       BINARY(16)   NOT NULL,
-    CONSTRAINT pk_oportunities PRIMARY KEY (id)
+    selected_candidate BINARY(16)   NULL,
+
+    CONSTRAINT pk_OPPORTUNITIES PRIMARY KEY (id)
 );
 
 CREATE TABLE reviews
@@ -63,24 +65,24 @@ CREATE TABLE reviews
     rating       INT        NOT NULL,
     created_at   datetime   NOT NULL,
     user_id      BINARY(16) NOT NULL,
-    oporunity_id BINARY(16) NOT NULL,
+    opportunity_id BINARY(16) NOT NULL,
     CONSTRAINT pk_reviews PRIMARY KEY (id)
 );
 
-CREATE TABLE opportuniy_skills
+CREATE TABLE opportunity_skills
 (
     id_opportunity BINARY(16) NOT NULL,
     id_skills      BINARY(16) NOT NULL,
-    CONSTRAINT pk_opportuniy_skills PRIMARY KEY (id_opportunity, id_skills)
+    CONSTRAINT pk_opportunity_skills PRIMARY KEY (id_opportunity, id_skills)
 );
 
-CREATE TABLE candidatorships
+CREATE TABLE candidatures
 (
     id               BINARY(16) NOT NULL,
     candidature_date datetime   NOT NULL,
     user_id          BINARY(16) NOT NULL,
     vacancy_id       BINARY(16) NOT NULL,
-    CONSTRAINT pk_candidatorships PRIMARY KEY (id)
+    CONSTRAINT pk_candidatures PRIMARY KEY (id)
 );
 
 CREATE TABLE password_reset_code
@@ -113,23 +115,23 @@ ALTER TABLE password_reset_requests
 ALTER TABLE password_reset_code
     ADD CONSTRAINT FK_PASSWORD_RESET_CODE_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-ALTER TABLE candidatorships
-    ADD CONSTRAINT FK_CANDIDATORSHIPS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE candidatures
+    ADD CONSTRAINT FK_CANDIDATURES_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
-ALTER TABLE candidatorships
-    ADD CONSTRAINT FK_CANDIDATORSHIPS_ON_VACANCY FOREIGN KEY (vacancy_id) REFERENCES oportunities (id);
+ALTER TABLE candidatures
+    ADD CONSTRAINT FK_CANDIDATURES_ON_VACANCY FOREIGN KEY (vacancy_id) REFERENCES opportunities (id);
 
-ALTER TABLE opportuniy_skills
-    ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_USERS FOREIGN KEY (id_opportunity) REFERENCES oportunities (id);
+ALTER TABLE opportunity_skills
+    ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_USERS FOREIGN KEY (id_opportunity) REFERENCES opportunities (id);
 
-ALTER TABLE opportuniy_skills
-    ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_SKILSS FOREIGN KEY (id_skills) REFERENCES skills (id);
+ALTER TABLE opportunity_skills
+    ADD CONSTRAINT FK_OPPORTUNITY_SKILLS_SKILLS FOREIGN KEY (id_skills) REFERENCES skills (id);
 
-ALTER TABLE oportunities
-    ADD CONSTRAINT FK_OPORTUNITIES_ON_POSTED_BY FOREIGN KEY (posted_by) REFERENCES users (id);
+ALTER TABLE opportunities
+    ADD CONSTRAINT FK_OPPORTUNITIES_ON_POSTED_BY FOREIGN KEY (posted_by) REFERENCES users (id);
 
 ALTER TABLE reviews
-    ADD CONSTRAINT FK_REVIEWS_ON_OPORUNITY FOREIGN KEY (oporunity_id) REFERENCES oportunities (id);
+    ADD CONSTRAINT FK_REVIEWS_ON_OPPORTUNITY FOREIGN KEY (opportunity_id) REFERENCES opportunities (id);
 
 ALTER TABLE reviews
     ADD CONSTRAINT FK_REVIEWS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

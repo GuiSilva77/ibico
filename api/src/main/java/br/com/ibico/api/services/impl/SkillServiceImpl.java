@@ -36,7 +36,7 @@ public class SkillServiceImpl implements SkillService {
         SearchSession searchSession = Search.session(entityManager);
 
         SearchResult<Skill> result = searchSession.search(Skill.class)
-                .where(f -> f.wildcard().fields("name", "skillname").matching(query + "*"))
+                .where(f -> f.wildcard().fields("name").matching(query + "*"))
                 .fetch(pageNo * pageSize, pageSize);
 
         List<SkillDto> skills = result.hits().stream()
@@ -70,8 +70,8 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public Set<Skill> convertToSkills(Set<SkillDto> skillDtos) {
-        return skillDtos.stream().map(dto -> {
+    public Set<Skill> convertToSkills(Set<SkillDto> skills) {
+        return skills.stream().map(dto -> {
             if (!skillRepository.existsByName(dto.name()))
                 return skillRepository.save(new Skill(dto.name()));
 

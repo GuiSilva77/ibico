@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table (name = "candidatorships")
+@Table (name = "candidatures")
 public class Candidature {
 
     @Id
@@ -28,14 +28,14 @@ public class Candidature {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "vacancy_id", nullable = false)
-    private Oportunity oportunity;
+    private Opportunity opportunity;
 
     public Candidature() {
     }
 
-    public Candidature(User candidate, Oportunity oportunity) {
+    public Candidature(User candidate, Opportunity opportunity) {
         this.candidate = candidate;
-        this.oportunity = oportunity;
+        this.opportunity = opportunity;
     }
 
     @PrePersist
@@ -67,12 +67,12 @@ public class Candidature {
         this.candidate = candidate;
     }
 
-    public Oportunity getOportunity() {
-        return oportunity;
+    public Opportunity getOpportunity() {
+        return opportunity;
     }
 
-    public void setOportunity(Oportunity oportunity) {
-        this.oportunity = oportunity;
+    public void setOpportunity(Opportunity opportunity) {
+        this.opportunity = opportunity;
     }
 
     @Override
@@ -80,12 +80,12 @@ public class Candidature {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Candidature that = (Candidature) o;
-        return Objects.equals(id, that.id) && Objects.equals(candidatureDate, that.candidatureDate) && Objects.equals(candidate, that.candidate) && Objects.equals(oportunity, that.oportunity);
+        return Objects.equals(id, that.id) && Objects.equals(candidatureDate, that.candidatureDate) && Objects.equals(candidate, that.candidate) && Objects.equals(opportunity, that.opportunity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, candidatureDate, candidate, oportunity);
+        return Objects.hash(id, candidatureDate, candidate, opportunity);
     }
 
     public CandidatureDto toCandidatureDto() {
@@ -95,6 +95,6 @@ public class Candidature {
                 this.candidate.getName(),
                 this.candidate.getUsername(),
                 this.candidate.getImgURL(),
-                this.oportunity.getId());
+                this.opportunity.getId());
     }
 }

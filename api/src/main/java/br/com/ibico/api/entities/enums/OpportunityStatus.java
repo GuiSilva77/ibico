@@ -1,6 +1,6 @@
 package br.com.ibico.api.entities.enums;
 
-public enum OportunityStatus {
+public enum OpportunityStatus {
     CREATED,
     CLOSED,
     CANCELED

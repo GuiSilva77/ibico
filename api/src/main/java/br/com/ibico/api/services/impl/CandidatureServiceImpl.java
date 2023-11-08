@@ -1,13 +1,13 @@
 package br.com.ibico.api.services.impl;
 
-import br.com.ibico.api.entities.Oportunity;
+import br.com.ibico.api.entities.Opportunity;
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Candidature;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.CandidatureDto;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.repositories.CandidatureRepository;
-import br.com.ibico.api.repositories.OportunityRepository;
+import br.com.ibico.api.repositories.OpportunityRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.CandidatureService;
 import org.springframework.data.domain.Page;
@@ -22,12 +22,12 @@ import java.util.UUID;
 public class CandidatureServiceImpl implements CandidatureService {
     private final CandidatureRepository candidatureRepository;
     private final UserRepository userRepository;
-    private final OportunityRepository oportunityRepository;
+    private final OpportunityRepository opportunityRepository;
 
-    public CandidatureServiceImpl(CandidatureRepository candidatureRepository, UserRepository userRepository, OportunityRepository oportunityRepository) {
+    public CandidatureServiceImpl(CandidatureRepository candidatureRepository, UserRepository userRepository, OpportunityRepository opportunityRepository) {
         this.candidatureRepository = candidatureRepository;
         this.userRepository = userRepository;
-        this.oportunityRepository = oportunityRepository;
+        this.opportunityRepository = opportunityRepository;
     }
 
     @Override
@@ -50,9 +50,18 @@ public class CandidatureServiceImpl implements CandidatureService {
     }
 
     @Override
-    public Response<CandidatureDto> findCandidaturesByOportunityId(String oportunityId, int pageNo, int pageSize, String sortBy, String sortDir) {
+    public Response<CandidatureDto> findCandidaturesByOpportunityId(String opportunityId, int pageNo, int pageSize, String sortBy, String sortDir) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String cpf = (String) authentication.getPrincipal();
+
+        Opportunity opportunity = opportunityRepository.findById(UUID.fromString(opportunityId)).orElseThrow(() -> new ResourceNotFoundException("opportunity", "id", opportunityId));
+
+        // if cpf is different from opportunity postedBy cpf, throw unauthorized exception
+        if (opportunity.getPostedBy().getCpf().equals(cpf))
+            throw new UnauthorizedException("Você não tem permissão para acessar essa oportunidade");
+
         Page<Candidature> candidaturePage = candidatureRepository
-                .findAllByOportunity_Id(UUID.fromString(oportunityId),
+                .findAllByOpportunity_Id(UUID.fromString(opportunityId),
                         PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDir), sortBy)));
 
         List<CandidatureDto> candidatures = candidaturePage.get()
@@ -74,11 +83,11 @@ public class CandidatureServiceImpl implements CandidatureService {
     }
 
     @Override
-    public CandidatureDto createCandidature(String cpf, String oportunityId) {
+    public CandidatureDto createCandidature(String cpf, String opportunityId) {
         User candidate = userRepository.findByCpf(cpf).orElseThrow(() -> new ResourceNotFoundException("user", "cpf", ""));
-        Oportunity oportunity = oportunityRepository.findById(UUID.fromString(oportunityId)).orElseThrow(() -> new ResourceNotFoundException("oportunity", "id", oportunityId));
+        Opportunity opportunity = opportunityRepository.findById(UUID.fromString(opportunityId)).orElseThrow(() -> new ResourceNotFoundException("opportunity", "id", opportunityId));
 
-        Candidature candidature = new Candidature(candidate, oportunity);
+        Candidature candidature = new Candidature(candidate, opportunity);
 
         return candidatureRepository.save(candidature).toCandidatureDto();
     }

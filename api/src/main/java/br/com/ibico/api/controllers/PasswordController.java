@@ -48,9 +48,9 @@ public class PasswordController {
         return ResponseEntity.ok(passwordResetRequestDtoResponse);
     }
 
-    @Operation(summary = "Reseta a senha do usuário")
+    @Operation(summary = "Redefine a senha do usuário")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Senha resetada com sucesso"),
+            @ApiResponse(responseCode = "200", description = "Senha redefinida com sucesso"),
             @ApiResponse(responseCode = "400", description = "Token de acesso inválido", content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping(path = "resetPassword", produces = "application/json", consumes = "application/json")

@@ -5,7 +5,7 @@ import br.com.ibico.api.entities.Review;
 import br.com.ibico.api.entities.dto.ReviewDto;
 import br.com.ibico.api.entities.payload.ReviewPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
-import br.com.ibico.api.repositories.OportunityRepository;
+import br.com.ibico.api.repositories.OpportunityRepository;
 import br.com.ibico.api.repositories.ReviewRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.ReviewService;
@@ -21,21 +21,21 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
-    private final OportunityRepository oportunityRepository;
+    private final OpportunityRepository opportunityRepository;
 
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository, UserRepository userRepository, OportunityRepository oportunityRepository) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, UserRepository userRepository, OpportunityRepository opportunityRepository) {
         this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
-        this.oportunityRepository = oportunityRepository;
+        this.opportunityRepository = opportunityRepository;
     }
 
     @Override
-    public Response<ReviewDto> findReviewsByOportunityId(String id, int pageNo, int pageSize, String sortBy, String sortDir) {
-        Page<Review> page = reviewRepository.findAllByOportunity_Id(UUID.fromString(id), PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDir), sortBy)));
+    public Response<ReviewDto> findReviewsByOpportunityId(String id, int pageNo, int pageSize, String sortBy, String sortDir) {
+        Page<Review> page = reviewRepository.findAllByOpportunity_Id(UUID.fromString(id), PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.valueOf(sortDir), sortBy)));
 
         if (page.isEmpty()) {
-            return new Response<ReviewDto>(
+            return new Response<>(
                     null,
                     page.getNumber(),
                     page.getSize(),
@@ -46,7 +46,7 @@ public class ReviewServiceImpl implements ReviewService {
             );
         }
 
-        return new Response<ReviewDto>(
+        return new Response<>(
                 page.getContent().stream()
                         .map(Review::toReviewDto)
                         .toList(),
@@ -73,8 +73,8 @@ public class ReviewServiceImpl implements ReviewService {
         review.setReviewer(userRepository.findByCpf(cpf)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "", "")));
 
-        review.setOportunity(oportunityRepository.findById(UUID.fromString(payload.oportunityId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Oportunity", "", "")));
+        review.setOpportunity(opportunityRepository.findById(UUID.fromString(payload.opportunityId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Opportunity", "", "")));
 
         return reviewRepository.save(review).toReviewDto();
     }
@@ -86,8 +86,8 @@ public class ReviewServiceImpl implements ReviewService {
         review.setReviewer(userRepository.findByCpf(cpf)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "", "")));
 
-        review.setOportunity(oportunityRepository.findById(UUID.fromString(reviewDto.oportunityId()))
-                .orElseThrow(() -> new ResourceNotFoundException("Oportunity", "", "")));
+        review.setOpportunity(opportunityRepository.findById(UUID.fromString(reviewDto.opportunityId()))
+                .orElseThrow(() -> new ResourceNotFoundException("Opportunity", "", "")));
 
         return reviewRepository.save(review).toReviewDto();
     }

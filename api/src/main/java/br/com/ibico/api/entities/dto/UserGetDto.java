@@ -11,5 +11,5 @@ import java.util.Set;
  */
 public record UserGetDto(@NotNull String name, @NotNull String username, @NotNull LocalDateTime dateOfCreation,
                          @NotNull String imgURL, boolean active, @NotNull String telephone, Set<SkillDto> skills,
-                         Set<OportunityDto> oportunitiesPosted, Set<ReviewDto> reviews) implements Serializable {
+                         Set<OpportunityDto> opportunitiesPosted, Set<ReviewDto> reviews) implements Serializable {
 }

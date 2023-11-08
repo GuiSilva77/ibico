@@ -52,7 +52,13 @@ public class UserServiceImpl implements UserService {
         List<UserDto> users = result.hits().stream()
                 .map(user -> {
                     if (!user.isActive()) return null;
-                    return user.toUserDtoMinusCPF();
+
+                    double avgRating = user.getReviews().stream()
+                            .mapToInt(Review::getRating)
+                            .average()
+                            .orElse(0);
+
+                    return user.toUserDtoMinusCPF(Math.floor(avgRating));
                 })
                 .toList();
 

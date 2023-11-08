@@ -57,13 +57,13 @@ public class Oportunity {
     private BigDecimal value;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "opportuniy_skills", joinColumns = @JoinColumn(name = "id_opportunity", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_USERS")), inverseJoinColumns = @JoinColumn(name = "id_skills", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_SKILLS")))
+    @JoinTable(name = "opportunity_skills", joinColumns = @JoinColumn(name = "id_opportunity", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_USERS")), inverseJoinColumns = @JoinColumn(name = "id_skills", foreignKey = @ForeignKey(name = "FK_OPPORTUNITY_SKILLS_SKILLS")))
     private Set<Skill> necessarySkills = new LinkedHashSet<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private OportunityStatus status;
+    private OpportunityStatus status;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
@@ -73,10 +73,14 @@ public class Oportunity {
     @JoinColumn(name = "posted_by", nullable = false)
     private User postedBy;
 
-    public Oportunity() {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "selected_candidate")
+    private User selectedCandidate;
+
+    public Opportunity() {
     }
 
-    public Oportunity(String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String timeLoad, String local, BigDecimal value, Set<Skill> necessarySkills, OportunityStatus status) {
+    public Opportunity(String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, String timeLoad, String local, BigDecimal value, Set<Skill> necessarySkills, OpportunityStatus status) {
         this.title = title;
         this.description = description;
         this.startDateTime = startDateTime;
@@ -88,8 +92,8 @@ public class Oportunity {
         this.status = status;
     }
 
-    public Oportunity(UUID oportunityId) {
-        this.id = oportunityId;
+    public Opportunity(UUID opportunityId) {
+        this.id = opportunityId;
     }
 
     @PrePersist
@@ -171,11 +175,11 @@ public class Oportunity {
         this.necessarySkills = necessarySkills;
     }
 
-    public OportunityStatus getStatus() {
+    public OpportunityStatus getStatus() {
         return status;
     }
 
-    public void setStatus(OportunityStatus status) {
+    public void setStatus(OpportunityStatus status) {
         this.status = status;
     }
 
@@ -199,7 +203,7 @@ public class Oportunity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Oportunity that = (Oportunity) o;
+        Opportunity that = (Opportunity) o;
         return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(description, that.description) && Objects.equals(startDateTime, that.startDateTime) && Objects.equals(endDateTime, that.endDateTime) && Objects.equals(timeLoad, that.timeLoad) && Objects.equals(local, that.local) && Objects.equals(value, that.value) && Objects.equals(necessarySkills, that.necessarySkills) && status == that.status && Objects.equals(createdAt, that.createdAt) && Objects.equals(postedBy, that.postedBy);
     }
 
@@ -208,8 +212,8 @@ public class Oportunity {
         return Objects.hash(id, title, description, startDateTime, endDateTime, timeLoad, local, value, necessarySkills, status, createdAt, postedBy);
     }
 
-    public OportunityDto toOportunityDto() {
-        return new OportunityDto(
+    public OpportunityDto toOpportunityDto() {
+        return new OpportunityDto(
                 this.id,
                 this.title,
                 this.description,
@@ -223,7 +227,7 @@ public class Oportunity {
                         .collect(Collectors.toSet()),
                 this.status,
                 this.createdAt,
-                new OportunityDto.UserDto(
+                new OpportunityDto.UserDto(
                         this.postedBy.getName(),
                         this.postedBy.getUsername(),
                         this.postedBy.getImgURL())

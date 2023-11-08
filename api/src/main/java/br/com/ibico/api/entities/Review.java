@@ -35,16 +35,16 @@ public class Review {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "oporunity_id")
-    private Oportunity oportunity;
+    @JoinColumn(name = "opportunity_id")
+    private Opportunity opportunity;
 
     public Review() {
     }
 
-    public Review(String review, int rating, Oportunity oportunity) {
+    public Review(String review, int rating, Opportunity opportunity) {
         this.review = review;
         this.rating = rating;
-        this.oportunity = oportunity;
+        this.opportunity = opportunity;
     }
 
     @PrePersist
@@ -94,12 +94,12 @@ public class Review {
         this.reviewer = reviewer;
     }
 
-    public Oportunity getOportunity() {
-        return oportunity;
+    public Opportunity getOpportunity() {
+        return opportunity;
     }
 
-    public void setOportunity(Oportunity oportunity) {
-        this.oportunity = oportunity;
+    public void setOpportunity(Opportunity opportunity) {
+        this.opportunity = opportunity;
     }
 
     @Override
@@ -107,12 +107,12 @@ public class Review {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Review review1 = (Review) o;
-        return rating == review1.rating && Objects.equals(id, review1.id) && Objects.equals(review, review1.review) && Objects.equals(createdAt, review1.createdAt) && Objects.equals(reviewer, review1.reviewer) && Objects.equals(oportunity, review1.oportunity);
+        return rating == review1.rating && Objects.equals(id, review1.id) && Objects.equals(review, review1.review) && Objects.equals(createdAt, review1.createdAt) && Objects.equals(reviewer, review1.reviewer) && Objects.equals(opportunity, review1.opportunity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, review, rating, createdAt, reviewer, oportunity);
+        return Objects.hash(id, review, rating, createdAt, reviewer, opportunity);
     }
 
     public ReviewDto toReviewDto() {
@@ -122,7 +122,7 @@ public class Review {
                 this.rating,
                 this.createdAt,
                 this.reviewer.getId(),
-                this.oportunity.getId()
+                this.opportunity.getId()
         );
     }
 }

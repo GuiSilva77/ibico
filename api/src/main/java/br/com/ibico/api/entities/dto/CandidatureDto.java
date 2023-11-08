@@ -10,5 +10,5 @@ import java.util.UUID;
  * DTO for {@link Candidature}
  */
 public record CandidatureDto(UUID id, LocalDateTime candidatureDate, String candidateName, String candidateUsername,
-                             String candidateImgURL, UUID oportunityId) implements Serializable {
+                             String candidateImgURL, UUID opportunityId) implements Serializable {
 }

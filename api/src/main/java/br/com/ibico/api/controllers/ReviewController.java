@@ -51,7 +51,7 @@ public class ReviewController {
             return ResponseEntity.ok(review);
         }
 
-        Response<ReviewDto> review = reviewService.findReviewsByOportunityId(id, pageNo, pageSize, sortBy, sortDir);
+        Response<ReviewDto> review = reviewService.findReviewsByOpportunityId(id, pageNo, pageSize, sortBy, sortDir);
         return ResponseEntity.ok(review);
     }
 
