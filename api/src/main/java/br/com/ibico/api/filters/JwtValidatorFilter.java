@@ -1,6 +1,6 @@
 package br.com.ibico.api.filters;
 
-import br.com.ibico.api.constraints.SecurityConstraints;
+import br.com.ibico.api.constants.SecurityConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -47,7 +47,7 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
 
         try {
             SecretKey key = Keys.hmacShaKeyFor(
-                    SecurityConstraints.JWT_KEY.getBytes(StandardCharsets.UTF_8));
+                    SecurityConstants.JWT_KEY.getBytes(StandardCharsets.UTF_8));
 
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)

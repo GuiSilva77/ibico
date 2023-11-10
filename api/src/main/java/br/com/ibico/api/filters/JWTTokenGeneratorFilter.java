@@ -10,16 +10,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static br.com.ibico.api.constraints.SecurityConstraints.JWT_EXPIRATION;
-import static br.com.ibico.api.constraints.SecurityConstraints.JWT_KEY;
+import static br.com.ibico.api.constants.SecurityConstants.JWT_EXPIRATION;
+import static br.com.ibico.api.constants.SecurityConstants.JWT_KEY;
 
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
 
@@ -45,7 +45,7 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                     .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION))
                     .signWith(secretKey).compact();
 
-            TokenReturn tokenReturn = new TokenReturn(jwt, new Date().getTime() + JWT_EXPIRATION);
+            TokenReturn tokenReturn = new TokenReturn(jwt, LocalDateTime.now().plusMinutes(JWT_EXPIRATION));
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
@@ -64,5 +64,5 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
     }
 
     record TokenReturn (String access_token,
-        Long expiration){}
+        LocalDateTime expiration){}
 }
