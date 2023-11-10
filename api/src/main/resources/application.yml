@@ -1,6 +1,10 @@
 spring:
   profiles:
     active: dev
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 springdoc:
   swagger-ui:
     path: /v1/swagger.html
@@ -8,6 +12,9 @@ aws:
   sns:
     region: sa-east-1
     topic-arn: arn:aws:sns:sa-east-1:511076607674:ibico-sms-topic
+server:
+  tomcat:
+    max-swallow-size: -1
 ---
 
 release:

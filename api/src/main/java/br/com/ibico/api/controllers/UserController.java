@@ -1,6 +1,7 @@
 package br.com.ibico.api.controllers;
 
 import br.com.ibico.api.entities.Response;
+import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.UserDto;
 import br.com.ibico.api.entities.dto.UserGetDto;
 import br.com.ibico.api.entities.dto.UserPutDto;
@@ -14,10 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -83,9 +87,11 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     }
     )
-    @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<UserDto> saveUser(@Valid @RequestBody UserPayload userPayload) {
-        UserDto savedUser = userService.saveUser(userPayload);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = "application/json")
+    public ResponseEntity<UserDto> saveUser(@RequestPart("payload")UserPayload payload, @RequestPart("profilePic") MultipartFile profilePic) {
+       /* UserDto savedUser = userService.saveUser(form.payload, form.profilePic);*/
+
+        UserDto savedUser = userService.saveUser(payload, profilePic);
 
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
@@ -122,5 +128,20 @@ public class UserController {
         userService.deactivateUser(cpf);
 
         return ResponseEntity.ok("Usuário desativado com sucesso!");
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "atualiza a imagem de perfil")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Foto atualizada", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "500", description = "Erro para envio de imagem", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @PostMapping(path = "{username}/update-profile-pic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = "plain/text")
+    public ResponseEntity<String> updateProfilePic(@Validated @PathVariable(name = "username") String username, @RequestPart(name = "profilePic") MultipartFile profilePic) {
+        userService.updateProfilePic(username, profilePic);
+
+        return ResponseEntity.ok("Pic Atualizada");
     }
 }

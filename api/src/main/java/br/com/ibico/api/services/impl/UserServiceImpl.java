@@ -1,5 +1,6 @@
 package br.com.ibico.api.services.impl;
 
+import br.com.ibico.api.constants.S3Constants;
 import br.com.ibico.api.entities.Response;
 import br.com.ibico.api.entities.Review;
 import br.com.ibico.api.entities.Role;
@@ -11,6 +12,7 @@ import br.com.ibico.api.entities.payload.UserPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
 import br.com.ibico.api.exceptions.ResourceNotValidException;
 import br.com.ibico.api.repositories.UserRepository;
+import br.com.ibico.api.services.FileStorageService;
 import br.com.ibico.api.services.SkillService;
 import br.com.ibico.api.services.UserService;
 import jakarta.persistence.EntityManager;
@@ -20,6 +22,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Set;
@@ -31,13 +34,15 @@ public class UserServiceImpl implements UserService {
     private final SkillService skillService;
     private final PasswordEncoder passwordEncoder;
     private final EntityManager entityManager;
+    private final FileStorageService fileStorageService;
 
     public UserServiceImpl(UserRepository userRepository,
-                           SkillService skillService, PasswordEncoder passwordEncoder, EntityManager entityManager) {
+                           SkillService skillService, PasswordEncoder passwordEncoder, EntityManager entityManager, FileStorageService fileStorageService) {
         this.userRepository = userRepository;
         this.skillService = skillService;
         this.passwordEncoder = passwordEncoder;
         this.entityManager = entityManager;
+        this.fileStorageService = fileStorageService;
     }
 
     @Override
@@ -82,7 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto saveUser(UserPayload payload) {
+    public UserDto saveUser(UserPayload payload, MultipartFile profilePic) {
         User user = payload.toUser();
 
         if (payload.passwd().isEmpty() || payload.passwd().length() < 8 || !payload.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
@@ -92,6 +97,10 @@ public class UserServiceImpl implements UserService {
         user.setRoles(Set.of(new Role(2L, "ROLE_USER")));
 
         user.setSkills(skillService.convertToSkills(payload.skills()));
+
+        fileStorageService.uploadFile(String.format("%s/%s.png",S3Constants.PROFILE_PICS_FOLDER, payload.username()), profilePic, S3Constants.PROFILE_PICS_BUCKET);
+
+        user.setImgURL(fileStorageService.getFileUrl(String.format("%s/%s.png", S3Constants.PROFILE_PICS_FOLDER, payload.username()), S3Constants.PROFILE_PICS_BUCKET));
 
         User savedUser = userRepository.save(user);
 
@@ -135,5 +144,12 @@ public class UserServiceImpl implements UserService {
         );
 
         return user.toUserGetDto();
+    }
+
+    @Override
+    public void updateProfilePic(String username, MultipartFile profilePic) {
+        fileStorageService.deleteFile(username, S3Constants.PROFILE_PICS_BUCKET);
+
+        fileStorageService.uploadFile(String.format("%s.png", username), profilePic, S3Constants.PROFILE_PICS_BUCKET);
     }
 }
