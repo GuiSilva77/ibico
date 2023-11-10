@@ -53,7 +53,7 @@ public class PasswordController {
             @ApiResponse(responseCode = "200", description = "Senha redefinida com sucesso"),
             @ApiResponse(responseCode = "400", description = "Token de acesso inválido", content = @Content(schema = @Schema(hidden = true)))
     })
-    @PostMapping(path = "resetPassword", produces = "application/json", consumes = "application/json")
+    @PostMapping(path = "resetPassword", produces = "plain/text", consumes = "application/json")
     public ResponseEntity<String> resetPassword(@Valid @RequestBody PasswordResetPayload payload) {
         passwordService.resetPassword(payload.accessToken(), payload.newPassword());
 

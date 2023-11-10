@@ -1,6 +1,6 @@
 package br.com.ibico.api.services.impl;
 
-import br.com.ibico.api.constraints.SmsConstraints;
+import br.com.ibico.api.constants.SMSConstants;
 import br.com.ibico.api.entities.PasswordResetCode;
 import br.com.ibico.api.entities.PasswordResetRequest;
 import br.com.ibico.api.entities.User;
@@ -47,14 +47,22 @@ public class PasswordServiceImpl implements PasswordService {
     public PasswordResetCodeDto generatePasswordResetCode(String cpf) {
         User user = userRepository.findByCpf(cpf).orElseThrow(() -> new ResourceNotFoundException("User", "cpf", ""));
         Random random = new Random();
+
+        int code;
+
+        do {
+            code = random.nextInt(999999);
+        } while (code < 100000);
+
         PasswordResetCode passwordResetCode = new PasswordResetCode(
                 user,
-                String.valueOf(random.nextInt(999999)),
+                String.valueOf(code),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusMinutes(PasswordResetCode.EXPIRATION_TIME));
 
         try {
-            smsService.sendSMS(String.format(SmsConstraints.SMS_PASSWORD_RESET_MESSAGE, user.getName(), passwordResetCode.getCode()), user.getTelephone());
+            logger.info("SMS code: {}", passwordResetCode.getCode());
+            smsService.sendSMS(String.format(SMSConstants.SMS_PASSWORD_RESET_MESSAGE, user.getName(), passwordResetCode.getCode()), user.getTelephone());
             logger.info("SMS sent to {}", user.getTelephone());
         } catch (Exception e) {
             logger.error("Error while sending SMS", e);
