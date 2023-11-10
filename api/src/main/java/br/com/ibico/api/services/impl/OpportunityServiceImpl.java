@@ -6,6 +6,7 @@ import br.com.ibico.api.entities.dto.OpportunityDto;
 import br.com.ibico.api.entities.enums.OpportunityStatus;
 import br.com.ibico.api.entities.payload.OpportunityPayload;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
+import br.com.ibico.api.exceptions.UnauthorizedException;
 import br.com.ibico.api.repositories.OpportunityRepository;
 import br.com.ibico.api.repositories.UserRepository;
 import br.com.ibico.api.services.OpportunityService;
@@ -50,12 +51,8 @@ public class OpportunityServiceImpl implements OpportunityService {
                 .fetch(pageNo * pageSize, pageSize);
 
         List<OpportunityDto> opportunities = result.hits().stream()
-                .map(opportunity -> {
-                    if (!opportunity.getStatus().equals(OpportunityStatus.CANCELED))
-                        return opportunity.toOpportunityDto();
-
-                    return null;
-                })
+                .map(Opportunity::toOpportunityDto)
+                .filter(opportunityDto -> opportunityDto.status() != OpportunityStatus.CANCELED)
                 .toList();
 
         long totalElements = result.total().hitCount();
@@ -109,9 +106,12 @@ public class OpportunityServiceImpl implements OpportunityService {
     }
 
     @Override
-    public void deactivateOpportunity(String id) {
+    public void deactivateOpportunity(String id, String cpf) {
         Opportunity opportunity = opportunityRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Opportunity", "Id", id));
+
+        if (!opportunity.getPostedBy().getCpf().equals(cpf))
+            throw new UnauthorizedException("você não pode deletar uma oportunidade que não é sua");
 
         opportunity.setStatus(OpportunityStatus.CANCELED);
 

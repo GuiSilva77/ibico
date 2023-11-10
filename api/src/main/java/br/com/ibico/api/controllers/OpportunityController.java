@@ -102,7 +102,10 @@ public class OpportunityController {
     })
     @DeleteMapping(path = "{id}", produces = "application/json")
     public ResponseEntity<String> deleteOpportunity(@Validated @PathVariable(name="id") String id) {
-        opportunityService.deactivateOpportunity(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String cpf = (String)authentication.getPrincipal();
+
+        opportunityService.deactivateOpportunity(id, cpf);
 
         return ResponseEntity.ok("Vaga apagada com sucesso!");
     }

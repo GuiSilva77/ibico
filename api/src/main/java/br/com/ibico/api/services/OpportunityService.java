@@ -10,6 +10,6 @@ public interface OpportunityService {
     OpportunityDto findOpportunityById(String Id);
     OpportunityDto saveOpportunity(OpportunityPayload payload, String cpf);
     OpportunityDto updateOpportunity(OpportunityPayload opportunityDto, String id);
-    void deactivateOpportunity(String id);
+    void deactivateOpportunity(String id, String cpf);
     void selectCandidate(String opportunityId, String candidateUsername);
 }
