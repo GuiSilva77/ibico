@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
     public UserDto saveUser(UserPayload payload, MultipartFile profilePic) {
         User user = payload.toUser();
 
-        if (payload.passwd().isEmpty() || payload.passwd().length() < 8 || !payload.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"))
+        if (payload.passwd().isEmpty() || payload.passwd().length() < 8 || !payload.passwd().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.])[A-Za-z\\d@$!%*?&.]{8,}$"))
             throw new ResourceNotValidException("password is empty or not valid");
 
         user.setPasswd(passwordEncoder.encode(user.getPasswd()));
