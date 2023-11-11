@@ -95,6 +95,9 @@ public class PasswordServiceImpl implements PasswordService {
     @Override
     @Transactional
     public void resetPassword(String accessToken, String newPassword) {
+        if (newPassword.length() < 8 || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*.?&]{8,}$"))
+            throw new ResourceNotValidException("password is empty or not valid");
+
         PasswordResetRequest passwordResetRequest = passwordResetRequestRepository
                 .findByAccessToken(accessToken)
                 .orElseThrow(() -> new ResourceNotFoundException("Password Reset Request", "accessToken", accessToken));
