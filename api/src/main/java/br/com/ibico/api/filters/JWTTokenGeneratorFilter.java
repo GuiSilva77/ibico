@@ -42,10 +42,10 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
                     .claim("username", authentication.getName())
                     .claim("authorities", populateAuthorities(authentication.getAuthorities()))
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION))
+                    .setExpiration(new Date(new Date().getTime() + JWT_EXPIRATION * 45_000))
                     .signWith(secretKey).compact();
 
-            TokenReturn tokenReturn = new TokenReturn(jwt, LocalDateTime.now().plusMinutes(JWT_EXPIRATION).toString());
+            TokenReturn tokenReturn = new TokenReturn(jwt, LocalDateTime.now().plusMinutes(45L).toString());
 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
