@@ -152,6 +152,6 @@ public class UserServiceImpl implements UserService {
     public void updateProfilePic(String username, MultipartFile profilePic) {
         fileStorageService.deleteFile(username, S3Constants.PROFILE_PICS_BUCKET);
 
-        fileStorageService.uploadFile(String.format("%s.png", username), profilePic, S3Constants.PROFILE_PICS_BUCKET);
+        fileStorageService.uploadFile(String.format("%s/%s.png", S3Constants.PROFILE_PICS_FOLDER, username), profilePic, S3Constants.PROFILE_PICS_BUCKET);
     }
 }
