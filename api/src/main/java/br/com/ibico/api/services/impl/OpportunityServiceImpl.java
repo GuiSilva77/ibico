@@ -18,8 +18,12 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -44,6 +48,35 @@ public class OpportunityServiceImpl implements OpportunityService {
     @Override
     @Transactional
     public Response<OpportunityDto> findOpportunities(String query, int pageNo, int pageSize, String sortBy, String sortDir) {
+
+        if (sortBy.equals("self")) {
+
+            List<OpportunityDto> opportunities = opportunityRepository.findByPostedBy_Cpf(query).stream()
+                                                    .map(Opportunity::toOpportunityDto)
+                                                    .toList();
+
+            int totalElements = opportunities.size();
+
+            return new Response<>(opportunities, pageNo, pageSize, totalElements, 0, false, true);
+        }
+
+
+        Comparator<OpportunityDto> comparator = Comparator.comparing(
+                opportunity -> {
+                    try {
+                        Field field = OpportunityDto.class.getDeclaredField(sortBy);
+                        field.setAccessible(true);
+                        return (Comparable) field.get(opportunity);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+
+        if ("DESC".equals(sortDir)) {
+            comparator = comparator.reversed();
+        }
+
         SearchSession searchSession = Search.session(entityManager);
 
         SearchResult<Opportunity> result = searchSession.search(Opportunity.class)
@@ -53,6 +86,7 @@ public class OpportunityServiceImpl implements OpportunityService {
         List<OpportunityDto> opportunities = result.hits().stream()
                 .map(Opportunity::toOpportunityDto)
                 .filter(opportunityDto -> opportunityDto.status() != OpportunityStatus.CANCELED)
+                .sorted(comparator)
                 .toList();
 
         long totalElements = result.total().hitCount();

@@ -10,7 +10,3 @@ services:
       MYSQL_PASSWORD: kenobi
     volumes:
       - ./scripts/script.sql:/docker-entrypoint-initdb.d/scripts.sql
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"

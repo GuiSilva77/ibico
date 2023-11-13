@@ -119,6 +119,8 @@ public class UserServiceImpl implements UserService {
         user.setImgURL(userDto.imgURL());
         user.setTelephone(userDto.telephone());
 
+        user.setPasswd(passwordEncoder.encode(userDto.passwd()));
+
         user.setSkills(skillService.convertToSkills(userDto.skills()));
 
         User savedUser = userRepository.save(user);

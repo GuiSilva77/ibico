@@ -55,10 +55,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource getCorsConfiguration() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://ibico.vercel.app/"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8080", "https://ibico.vercel.app/", "http://localhost:3000"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         config.setAllowCredentials(true);
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Requestor-Type"));
+        config.setAllowedHeaders(Arrays.asList("*"));
         config.setExposedHeaders(Arrays.asList("X-Get-Header"));
         config.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

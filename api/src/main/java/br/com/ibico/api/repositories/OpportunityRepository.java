@@ -6,9 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public interface OpportunityRepository extends JpaRepository<Opportunity, UUID> {
-    Page<Opportunity> findByTitle(String title, Pageable pageable);
+    Set<Opportunity> findByPostedBy_Cpf(String cpf);
 }

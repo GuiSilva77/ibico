@@ -6,6 +6,7 @@ import br.com.ibico.api.entities.Candidature;
 import br.com.ibico.api.entities.User;
 import br.com.ibico.api.entities.dto.CandidatureDto;
 import br.com.ibico.api.exceptions.ResourceNotFoundException;
+import br.com.ibico.api.exceptions.ResourceNotValidException;
 import br.com.ibico.api.exceptions.UnauthorizedException;
 import br.com.ibico.api.repositories.CandidatureRepository;
 import br.com.ibico.api.repositories.OpportunityRepository;
@@ -59,8 +60,8 @@ public class CandidatureServiceImpl implements CandidatureService {
 
         Opportunity opportunity = opportunityRepository.findById(UUID.fromString(opportunityId)).orElseThrow(() -> new ResourceNotFoundException("opportunity", "id", opportunityId));
 
-        // if cpf is different from opportunity postedBy cpf, throw unauthorized exception
-        if (opportunity.getPostedBy().getCpf().equals(cpf))
+
+        if (!opportunity.getPostedBy().getCpf().equals(cpf))
             throw new UnauthorizedException("Você não tem permissão para acessar essa oportunidade");
 
         Page<Candidature> candidaturePage = candidatureRepository
@@ -87,6 +88,9 @@ public class CandidatureServiceImpl implements CandidatureService {
 
     @Override
     public CandidatureDto createCandidature(String cpf, String opportunityId) {
+        if(candidatureRepository.existsByCandidate_CpfAndOpportunity_Id(cpf, UUID.fromString(opportunityId)))
+            throw new ResourceNotValidException("Usuário já é um candidato para essa vaga.");
+
         User candidate = userRepository.findByCpf(cpf).orElseThrow(() -> new ResourceNotFoundException("user", "cpf", ""));
         Opportunity opportunity = opportunityRepository.findById(UUID.fromString(opportunityId)).orElseThrow(() -> new ResourceNotFoundException("opportunity", "id", opportunityId));
 

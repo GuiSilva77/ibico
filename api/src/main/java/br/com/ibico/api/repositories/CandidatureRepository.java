@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface CandidatureRepository extends JpaRepository<Candidature, UUID> {
     Page<Candidature> findAllByCandidate_Cpf(String cpf, Pageable pageable);
     Page<Candidature> findAllByOpportunity_Id(UUID opportunityId, Pageable pageable);
+    boolean existsByCandidate_CpfAndOpportunity_Id(String cpf, UUID oppotunityId);
 }
