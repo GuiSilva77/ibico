@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/v1/opportunities")
 public class OpportunityController {
 
     private final OpportunityService opportunityService;
@@ -36,7 +35,7 @@ public class OpportunityController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @GetMapping(produces = "application/json")
+    @GetMapping(path ="/v1/opportunities", produces = "application/json")
     public ResponseEntity<Response<OpportunityDto>> findOpportunityByName(@RequestParam(value = "query", defaultValue = "", required = false) String query,
                                                                          @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
                                                                          @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
@@ -54,11 +53,28 @@ public class OpportunityController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @GetMapping(path = "{id}", produces = "application/json")
+    @GetMapping(path = "/v1/opportunities/{id}", produces = "application/json")
     public ResponseEntity<OpportunityDto> findOpportunityById(@Validated @PathVariable(name="id") String id) {
         OpportunityDto opportunity = opportunityService.findOpportunityById(id);
 
         return ResponseEntity.ok(opportunity);
+    }
+
+
+    @Operation(summary = "Busca suas vagas criadas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Vaga(s) encontrada(s)"),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
+    })
+    @GetMapping(path = "/v1/users/opportunites", produces = "application/json")
+    public ResponseEntity<Response<OpportunityDto>> getOwnOpportunities() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String cpf = (String)authentication.getPrincipal();
+
+        Response<OpportunityDto> response = opportunityService.findOwnOpportunities(cpf);
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Cria uma nova vaga")
@@ -68,7 +84,7 @@ public class OpportunityController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping(consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/v1/opportunities",consumes = "application/json", produces = "application/json")
     public ResponseEntity<OpportunityDto> saveOpportunity(@Valid @RequestBody OpportunityPayload opportunityPayload) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,7 +101,7 @@ public class OpportunityController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PutMapping(path = "{id}", consumes = "application/json", produces = "application/json")
+    @PutMapping(path = "/v1/opportunities/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<OpportunityDto> updateOpportunity(@Validated @PathVariable(name="id") String id, @Valid @RequestBody OpportunityPayload opportunityPayload) {
 
         OpportunityDto updatedOpportunity = opportunityService.updateOpportunity(opportunityPayload, id);
@@ -100,7 +116,7 @@ public class OpportunityController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @DeleteMapping(path = "{id}", produces = "application/json")
+    @DeleteMapping(path = "/v1/opportunities/{id}", produces = "application/json")
     public ResponseEntity<String> deleteOpportunity(@Validated @PathVariable(name="id") String id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String cpf = (String)authentication.getPrincipal();
@@ -117,7 +133,7 @@ public class OpportunityController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "403", description = "Usuário não autorizado", content = @Content(schema = @Schema(hidden = true))),
     })
-    @PostMapping(path = "{opportunityId}/candidates/{candidateUsername}", produces = "plain/text")
+    @PostMapping(path = "/v1/opportunities/{opportunityId}/candidates/{candidateUsername}", produces = "plain/text")
     public ResponseEntity<String> selectCandidate(@Validated @PathVariable(name="opportunityId") String opportunityId,
                                                   @Validated @PathVariable(name="candidateUsername") String candidateUsername) {
         opportunityService.selectCandidate(opportunityId, candidateUsername);

@@ -18,7 +18,8 @@ public record OpportunityDto(UUID id, @NotNull String title, @NotNull String des
                              @NotNull LocalDateTime startDateTime, @NotNull LocalDateTime endDateTime,
                              @NotNull String timeLoad, @NotNull String local, @NotNull BigDecimal value,
                              @NotNull Set<SkillDto> necessarySkills, @NotNull OpportunityStatus status,
-                             @NotNull LocalDateTime createdAt, UserDto postedBy) implements Serializable {
+                             @NotNull LocalDateTime createdAt, UserDto postedBy,
+                             LocalDateTime opportunityClosedTIme) implements Serializable {
     /**
      * DTO for {@link User}
      */

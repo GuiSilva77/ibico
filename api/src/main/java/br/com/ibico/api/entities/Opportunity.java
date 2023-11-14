@@ -77,6 +77,9 @@ public class Opportunity {
     @JoinColumn(name = "selected_candidate")
     private User selectedCandidate;
 
+    @Column(name = "opportunity_closed_time", nullable = true)
+    private LocalDateTime opportunityClosedTIme;
+
     public Opportunity() {
     }
 
@@ -101,6 +104,17 @@ public class Opportunity {
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
         }
+
+        if (this.opportunityClosedTIme == null && (this.status == OpportunityStatus.CANCELED || this.status == OpportunityStatus.CLOSED))
+            this.opportunityClosedTIme = LocalDateTime.now();
+    }
+
+    public LocalDateTime getOpportunityClosedTIme() {
+        return opportunityClosedTIme;
+    }
+
+    public void setOpportunityClosedTIme(LocalDateTime opportunityClosedTIme) {
+        this.opportunityClosedTIme = opportunityClosedTIme;
     }
 
     public User getSelectedCandidate() {
@@ -238,7 +252,8 @@ public class Opportunity {
                 new OpportunityDto.UserDto(
                         this.postedBy.getName(),
                         this.postedBy.getUsername(),
-                        this.postedBy.getImgURL())
+                        this.postedBy.getImgURL()),
+                this.opportunityClosedTIme
         );
     }
 }

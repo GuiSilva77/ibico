@@ -6,6 +6,7 @@ import br.com.ibico.api.entities.payload.OpportunityPayload;
 
 public interface OpportunityService {
 
+    public Response<OpportunityDto> findOwnOpportunities(String cpf);
     Response<OpportunityDto> findOpportunities(String query, int pageNo, int pageSize, String sortBy, String sortDir);
     OpportunityDto findOpportunityById(String Id);
     OpportunityDto saveOpportunity(OpportunityPayload payload, String cpf);

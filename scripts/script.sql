@@ -54,6 +54,7 @@ CREATE TABLE opportunities
     created_at      datetime     NOT NULL,
     posted_by       BINARY(16)   NOT NULL,
     selected_candidate BINARY(16)   NULL,
+    opportunity_closed_time datetime     NULL,
 
     CONSTRAINT pk_OPPORTUNITIES PRIMARY KEY (id)
 );

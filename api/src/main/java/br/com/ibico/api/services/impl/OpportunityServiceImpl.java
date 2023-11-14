@@ -46,20 +46,19 @@ public class OpportunityServiceImpl implements OpportunityService {
     }
 
     @Override
+    public Response<OpportunityDto> findOwnOpportunities(String cpf) {
+        List<OpportunityDto> opportunities = opportunityRepository.findByPostedBy_Cpf(cpf).stream()
+                .map(Opportunity::toOpportunityDto)
+                .toList();
+
+        int totalElements = opportunities.size();
+
+        return new Response<>(opportunities, 0, 0, totalElements, 0, false, true);
+    }
+
+    @Override
     @Transactional
     public Response<OpportunityDto> findOpportunities(String query, int pageNo, int pageSize, String sortBy, String sortDir) {
-
-        if (sortBy.equals("self")) {
-
-            List<OpportunityDto> opportunities = opportunityRepository.findByPostedBy_Cpf(query).stream()
-                                                    .map(Opportunity::toOpportunityDto)
-                                                    .toList();
-
-            int totalElements = opportunities.size();
-
-            return new Response<>(opportunities, pageNo, pageSize, totalElements, 0, false, true);
-        }
-
 
         Comparator<OpportunityDto> comparator = Comparator.comparing(
                 opportunity -> {
